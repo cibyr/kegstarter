@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from main.fields import CurrencyField
+from .fields import CurrencyField
 
 class Brewery(models.Model):
     #TODO: Proper Geo support?
