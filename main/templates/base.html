@@ -1,0 +1,13 @@
+{% load staticfiles %}
+
+<html>
+<head>
+    <title>{% block title %}Kegstarter{% endblock %}</title>
+</head>
+<body>
+<h1>
+    <a href="/"><img src="{% static "logo.png" %}" alt="KEGSTARTER"/></a>
+</h1>
+{% block content %}{% endblock %}
+</body>
+</html>

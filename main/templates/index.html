@@ -1,11 +1,22 @@
-<html>
-<body>
-<h1>KEGSTARTER</h1>
+{% extends "base.html" %}
+
+{% block content %}
+
+<p>
+{% if user.is_authenticated %}
+Welcome, {{ user }}!
+<a href="/accounts/logout">Log out</a>
+{% else %}
+<a href="/accounts/register">Sign up</a>
+<a href="/accounts/login">Log in</a>
+{% endif %}
+</p>
+
 <h2>Newly added</h2>
 <ul>
 {% for keg in kegs %}
     <li>{{ keg }}</li>
 {% endfor %}
 </ul>
-</body>
-</html>
+
+{% endblock %}
