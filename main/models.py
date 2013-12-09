@@ -29,10 +29,18 @@ class Keg(models.Model):
         return self.name
 
 class Donation(models.Model):
+    class Meta:
+        permissions = (
+                ('accept_donation', 'Can accept donations'),
+        )
+
     user = models.ForeignKey(User)
     amount = CurrencyField()
     recipient = models.ForeignKey(User, related_name='donations_received')
     timestamp = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return '${0.amount} from {0.user} to {0.recipient}'.format(self)
 
 class Purchase(models.Model):
     user = models.ForeignKey(User)
