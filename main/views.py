@@ -9,7 +9,11 @@ from .models import Keg, Donation, Purchase
 
 def home(request):
     total_donations = Donation.objects.all().aggregate(Sum('amount'))['amount__sum']
+    if total_donations is None:
+        total_donations = 0
     spent = Purchase.objects.all().aggregate(Sum('keg__price'))['keg__price__sum']
+    if spent is None:
+        spent = 0
     balance = total_donations - spent
 
     recent_kegs = Keg.objects.order_by('-added')[:3]
