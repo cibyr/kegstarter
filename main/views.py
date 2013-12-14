@@ -14,10 +14,10 @@ def home(request):
 
     recent_kegs = Keg.objects.order_by('-added')[:3]
     context = {
-            'kegs': recent_kegs,
-            'total_donations': total_donations,
-            'spent': spent,
-            'balance': balance,
+        'kegs': recent_kegs,
+        'total_donations': total_donations,
+        'spent': spent,
+        'balance': balance,
     }
     return render(request, 'index.html', context)
 
