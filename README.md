@@ -1,4 +1,4 @@
-kegstarter
+![KegStarter](/main/static/logo.png "KegStarter")
 ==========
 
 A system for spending our beer fund
