@@ -1,10 +1,13 @@
 from django.conf.urls import patterns, include, url
 
+from main.views import KegDetail
+
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', 'main.views.home', name='home'),
+    url(r'^keg/(?P<pk>\d+)/', KegDetail.as_view(), name='keg'),
 
     url(r'^donations/accept/$', 'main.views.accept_donation', name='accept_donation'),
 

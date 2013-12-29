@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 from .fields import CurrencyField
 
@@ -27,6 +28,9 @@ class Keg(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return '/keg/{}/{}/{}'.format(self.pk, slugify(self.brewery.name), slugify(self.name))
 
 class Donation(models.Model):
     class Meta:

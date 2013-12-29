@@ -2,16 +2,6 @@
 
 {% block content %}
 
-<p>
-{% if user.is_authenticated %}
-Welcome, {{ user }}!
-<a href="/accounts/logout">Log out</a>
-{% else %}
-<a href="/accounts/register">Sign up</a>
-<a href="/accounts/login">Log in</a>
-{% endif %}
-</p>
-
 <p>Total donations: ${{ total_donations }}</p>
 <p>Spent on beer: ${{ spent }}</p>
 <p>Current balance: ${{ balance }}</p>
@@ -19,7 +9,7 @@ Welcome, {{ user }}!
 <h2>Newly added</h2>
 <ul>
 {% for keg in kegs %}
-    <li>{{ keg }}</li>
+    <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a></li>
 {% endfor %}
 </ul>
 

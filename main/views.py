@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import permission_required
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views.generic import DetailView
 
 from .forms import DonationForm
 from .models import Keg, Donation, Purchase
@@ -24,6 +25,9 @@ def home(request):
         'balance': balance,
     }
     return render(request, 'index.html', context)
+
+class KegDetail(DetailView):
+    model = Keg
 
 def register(request):
     if request.method == 'POST':
