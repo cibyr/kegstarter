@@ -8,6 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^$', 'main.views.home', name='home'),
     url(r'^keg/(?P<pk>\d+)/', KegDetail.as_view(), name='keg'),
+    url(r'^vote', 'main.views.vote', name='vote'),
 
     url(r'^donations/accept/$', 'main.views.accept_donation', name='accept_donation'),
 

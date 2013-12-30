@@ -1,11 +1,13 @@
+from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 
-from .forms import DonationForm
+from .forms import DonationForm, VoteForm
 from .models import Keg, Donation, Purchase
 
 def sum_queryset_field(qs, field):
@@ -39,6 +41,33 @@ def home(request):
 
 class KegDetail(DetailView):
     model = Keg
+
+    def get_context_data(self, **kwargs):
+        context = super(KegDetail, self).get_context_data(**kwargs)
+        context.update(fund_context())
+        if self.request.user.is_authenticated():
+            context['user_balance'] = get_user_balance(self.request.user)
+        context['votes'] = sum_queryset_field(self.object.vote_set, 'value')
+        return context
+
+@require_POST
+@login_required
+def vote(request):
+    form = VoteForm(request.POST)
+    if form.is_valid() and form.cleaned_data['value'] > 0:
+        vote = form.save(commit=False)
+        vote.user = request.user
+        #TODO: take a lock on something (the user?) to prevent a user being able
+        # to "overspend" their votes in a race here
+        if vote.value > get_user_balance(request.user):
+            messages.error("Vote failed: you don't have that many votes")
+        else:
+            vote.save()
+            messages.info(request, "{} vote{} for {} sucessfully recorded".format(
+                vote.value, 's' if vote.value > 1 else '', vote.keg))
+        return HttpResponseRedirect(vote.keg.get_absolute_url())
+    else:
+        return HttpResponseBadRequest()
 
 def register(request):
     if request.method == 'POST':

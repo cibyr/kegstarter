@@ -17,6 +17,13 @@ Welcome, {{ user }}!
 <a href="/accounts/login">Log in</a>
 {% endif %}
 </p>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 {% block content %}{% endblock %}
 </body>
 </html>

@@ -56,3 +56,6 @@ class Vote(models.Model):
     keg = models.ForeignKey(Keg)
     value = models.PositiveIntegerField()
     timestamp = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return '{0.value} votes by {0.user} for {0.keg}'.format(self)

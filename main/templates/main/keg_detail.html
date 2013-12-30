@@ -14,6 +14,35 @@
 <tr><th>Price</th><td>${{ keg.price }}</td></tr>
 </table>
 
+<p>
+{% if keg.price > balance %}
+We can't afford this keg right now.
+{% else %}
+{# TODO: Show this keg's current position in the voting #}
+{% endif %}
+</p>
+
+<p>This keg currently has {{ votes }} votes.</p>
+
 <p>{{ keg.desc|format_markdown}}</p>
+
+{% if user.is_authenticated %}
+{# TODO: AJAX the voting #}
+<h3>Vote for this keg:</h3>
+{% if user_balance > 0 %}
+<form method="post" action="{% url 'vote' %}">
+{% csrf_token %}
+<input type="hidden" name="keg" value="{{ keg.id }}">
+<p><input type="text" name="value" value="1" size="2"> times <input type="submit" value="VOTE"></p>
+</form>
+<form method="post" action="{% url 'vote' %}">
+{% csrf_token %}
+<input type="hidden" name="keg" value="{{ keg.id }}">
+<input type="hidden" name="value" value="{{ user_balance }}">
+<p><input type="submit" value="Use ALL MY VOTES on this keg"></p>
+</form>
+{% endif %}
+<p>(You currently have {{user_balance}} votes)</p>
+{% endif %}
 
 {% endblock %}
