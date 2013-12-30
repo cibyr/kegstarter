@@ -1,0 +1,78 @@
+[
+{
+    "pk": 1,
+    "model": "main.brewery",
+    "fields": {
+        "desc": "A brewery somewhere.",
+        "name": "A Brewer",
+        "location": "Somewhere"
+    }
+},
+{
+    "pk": 1,
+    "model": "main.keg",
+    "fields": {
+        "style": "Lager",
+        "added": "2013-12-09T06:06:00.045Z",
+        "name": "Generic Lager",
+        "gallons": 15.5,
+        "price": "123.00",
+        "brewery": 1,
+        "desc": "A beer"
+    }
+},
+{
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "is_active": true,
+        "is_superuser": true,
+        "is_staff": true,
+        "last_login": "2013-12-29T10:06:40.008Z",
+        "groups": [],
+        "user_permissions": [],
+        "email": "",
+        "date_joined": "2013-12-09T05:33:58.355Z"
+    }
+},
+{
+    "pk": 2,
+    "model": "auth.user",
+    "fields": {
+        "username": "kegop",
+        "first_name": "",
+        "last_name": "",
+        "is_active": true,
+        "is_superuser": false,
+        "is_staff": false,
+        "last_login": "2013-12-09T05:35:37.320Z",
+        "groups": [],
+        "user_permissions": [
+            31
+        ],
+        "email": "",
+        "date_joined": "2013-12-09T05:34:53Z"
+    }
+},
+{
+    "pk": 3,
+    "model": "auth.user",
+    "fields": {
+        "username": "drinker",
+        "first_name": "",
+        "last_name": "",
+        "is_active": true,
+        "is_superuser": false,
+        "is_staff": false,
+        "last_login": "2013-12-09T05:35:51.921Z",
+        "groups": [],
+        "user_permissions": [],
+        "password": "pbkdf2_sha256$12000$gCSRwd9BFVsi$XwJtiJoUehqO8+TYDhGTN02GvjOR+DPdWxLQiT2o5FE=",
+        "email": "",
+        "date_joined": "2013-12-09T05:35:51.921Z"
+    }
+}
+]

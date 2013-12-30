@@ -8,22 +8,33 @@ from django.views.generic import DetailView
 from .forms import DonationForm
 from .models import Keg, Donation, Purchase
 
-def home(request):
-    total_donations = Donation.objects.all().aggregate(Sum('amount'))['amount__sum']
-    if total_donations is None:
-        total_donations = 0
-    spent = Purchase.objects.all().aggregate(Sum('keg__price'))['keg__price__sum']
-    if spent is None:
-        spent = 0
-    balance = total_donations - spent
+def sum_queryset_field(qs, field):
+    return qs.aggregate(Sum(field))[field+'__sum'] or 0
 
-    recent_kegs = Keg.objects.order_by('-added')[:3]
-    context = {
-        'kegs': recent_kegs,
+def get_user_balance(user):
+    '''Return how many unused votes a user has.'''
+    donation_sum = sum_queryset_field(user.donation_set, 'amount')
+    spent = sum_queryset_field(user.vote_set, 'value')
+    return int(donation_sum - spent)
+
+def fund_context():
+    '''total_donations, spent and balance (used on almost every page)'''
+    #TODO: This really should be cached
+    total_donations = sum_queryset_field(Donation.objects.all(), 'amount')
+    spent = sum_queryset_field(Purchase.objects.all(), 'keg__price')
+    balance =  total_donations - spent
+    return {
         'total_donations': total_donations,
         'spent': spent,
         'balance': balance,
     }
+
+def home(request):
+    recent_kegs = Keg.objects.order_by('-added')[:3]
+    context = {
+        'kegs': recent_kegs,
+    }
+    context.update(fund_context())
     return render(request, 'index.html', context)
 
 class KegDetail(DetailView):
