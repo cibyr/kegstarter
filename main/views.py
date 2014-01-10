@@ -122,5 +122,12 @@ def accept_donation(request):
             new_donation.recipient = request.user
             new_donation.save()
     form = DonationForm()
-    context = { 'form': form, 'new_donation': new_donation }
+    context = {
+        'form': form,
+        'new_donation': new_donation,
+        'donation_history': get_donation_history(request.user)
+    }
     return render(request, 'donation.html', context)
+
+def get_donation_history(user):
+    return Donation.objects.filter(recipient__exact=user).order_by('timestamp')
