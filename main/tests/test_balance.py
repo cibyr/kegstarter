@@ -4,8 +4,8 @@ from django.test import TestCase
 
 from django.contrib.auth.models import User
 
-from .models import Keg, Donation, Vote, Purchase
-from .views import get_user_balance, fund_context
+from main.models import Keg, Donation, Vote, Purchase
+from main.views import get_user_balance, fund_context
 
 class BalanceTestCase(TestCase):
     fixtures = ['basic.json']

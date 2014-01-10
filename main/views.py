@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
+from django.utils.timezone import utc
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 
@@ -16,8 +17,11 @@ from .models import Keg, Donation, Purchase, KegMaster
 def get_current_kegmaster():
     '''Return the latest Keg Master that hasn't ended their shift'''
     try:
-        latest_kegmaster = KegMaster.objects.latest('start')
-        if (latest_kegmaster.end is None) or (latest_kegmaster.end > datetime.today()):
+        latest_kegmaster = KegMaster.objects\
+            .filter(start__lte=datetime.utcnow().replace(tzinfo=utc))\
+            .filter(Q(end__gte=datetime.utcnow().replace(tzinfo=utc)) | Q(end__isnull=True))\
+            .latest('end')
+        if latest_kegmaster is not None:
             return latest_kegmaster
     except KegMaster.DoesNotExist:
         pass
