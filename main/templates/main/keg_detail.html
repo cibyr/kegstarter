@@ -5,6 +5,8 @@
 
 {% block content %}
 
+<p>User is current kegmaster: {{ user_is_current_kegmaster }}</p>
+
 <h2>{{ keg }}</h2>
 
 <table>
@@ -14,35 +16,47 @@
 <tr><th>Price</th><td>${{ keg.price }}</td></tr>
 </table>
 
-<p>
-{% if keg.price > balance %}
-We can't afford this keg right now.
+{% if keg.purchase %}
+    <p>This keg has been purchased by {{ keg.purchase.user }} on {{ keg.purchase.timestamp }}</p>
+{% elif keg.price > balance %}
+    <p>We can't afford this keg right now.</p>
+{% elif winning %}
+    <p>This keg is the current candidate for the next purchase.</p>
+    {% if user_is_current_kegmaster %}
+        <form method="post" action="{% url 'purchase' %}">
+        {% csrf_token %}
+        <input type="hidden" name="keg" value="{{ keg.id }}">
+        <p>You are the current kegmaster: <input type="submit" value="Click here to confirm that you are buying this keg"></p>
+        </form>
+    {% endif %}
 {% else %}
-{# TODO: Show this keg's current position in the voting #}
+    {# TODO: Show this keg's current position in the voting #}
 {% endif %}
-</p>
 
 <p>This keg currently has {{ keg.votes }} votes.</p>
 
+<h2>Description</h2>
 <p>{{ keg.desc|format_markdown}}</p>
 
-{% if user.is_authenticated %}
-{# TODO: AJAX the voting #}
-<h3>Vote for this keg:</h3>
-{% if user_balance > 0 %}
-<form method="post" action="{% url 'vote' %}">
-{% csrf_token %}
-<input type="hidden" name="keg" value="{{ keg.id }}">
-<p><input type="text" name="value" value="1" size="2"> times <input type="submit" value="VOTE"></p>
-</form>
-<form method="post" action="{% url 'vote' %}">
-{% csrf_token %}
-<input type="hidden" name="keg" value="{{ keg.id }}">
-<input type="hidden" name="value" value="{{ user_balance }}">
-<p><input type="submit" value="Use ALL MY VOTES on this keg"></p>
-</form>
-{% endif %}
-<p>(You currently have {{user_balance}} votes)</p>
+{% if user.is_authenticated and not keg.purchase %}
+    {# TODO: AJAX the voting #}
+    <h3>Vote for this keg:</h3>
+    {% if user_balance > 0 %}
+        <form method="post" action="{% url 'vote' %}">
+        {% csrf_token %}
+        <input type="hidden" name="keg" value="{{ keg.id }}">
+        <p><input type="text" name="value" value="1" size="2"> times <input type="submit" value="VOTE"></p>
+        </form>
+        <form method="post" action="{% url 'vote' %}">
+        {% csrf_token %}
+        <input type="hidden" name="keg" value="{{ keg.id }}">
+        <input type="hidden" name="value" value="{{ user_balance }}">
+        <p><input type="submit" value="Use ALL MY VOTES on this keg"></p>
+        </form>
+    {% else %}
+        <p>Donate to vote on this keg.</p>
+    {% endif %}
+    <p>(You currently have {{user_balance}} votes)</p>
 {% endif %}
 
 {% endblock %}

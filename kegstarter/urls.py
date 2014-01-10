@@ -8,6 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^$', 'main.views.home', name='home'),
     url(r'^keg/(?P<pk>\d+)/', KegDetail.as_view(), name='keg'),
+    url(r'^keg/purchase/', 'main.views.purchase', name='purchase'),
     url(r'^keg/create/', KegCreate.as_view(), name='keg_create'),
     url(r'^brewery/(?P<pk>\d+)/', BreweryDetail.as_view(), name='brewery'),
     url(r'^brewery/create/', BreweryCreate.as_view(), name='brewery_create'),

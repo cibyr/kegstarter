@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Sum, Q
+from django.db.models import Sum, Max, Q
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
 from django.utils.timezone import utc
@@ -11,7 +11,7 @@ from django.views.generic import CreateView, DetailView
 from datetime import datetime
 
 
-from .forms import DonationForm, VoteForm
+from .forms import DonationForm, VoteForm, PurchaseForm
 from .models import Brewery, Keg, Donation, Purchase, KegMaster
 
 def get_current_kegmaster():
@@ -56,14 +56,23 @@ def home(request):
     context.update(fund_context())
     return render(request, 'index.html', context)
 
+def get_winning_kegs(current_balance):
+    buyable_kegs = Keg.objects.filter(price__lte=current_balance)
+    kegs_by_votes = buyable_kegs.annotate(votes=Sum('vote__value'))
+    max_votes = kegs_by_votes.aggregate(Max('votes'))['votes__max']
+    return kegs_by_votes.filter(votes=max_votes)
+
 class KegDetail(DetailView):
     model = Keg
 
     def get_context_data(self, **kwargs):
         context = super(KegDetail, self).get_context_data(**kwargs)
         context.update(fund_context())
+        winning_kegs = get_winning_kegs(context['balance'])
         if self.request.user.is_authenticated():
+            context['user_is_current_kegmaster'] = (self.request.user == get_current_kegmaster().user)
             context['user_balance'] = get_user_balance(self.request.user)
+            context['winning'] = (self.object in winning_kegs)
         return context
 
 
@@ -97,6 +106,30 @@ def vote(request):
         return HttpResponseRedirect(vote.keg.get_absolute_url())
     else:
         return HttpResponseBadRequest()
+
+
+@require_POST
+@login_required
+def purchase(request):
+    form = PurchaseForm(request.POST)
+    if form.is_valid():
+        purchase = form.save(commit=False)
+        # Check that the keg is the current winner
+        current_balance = fund_context()['balance']
+        if purchase.keg not in get_winning_kegs(current_balance):
+            return HttpResponseBadRequest('Not the winning keg')
+        # Check that the user is the current kegmaster
+        if request.user != get_current_kegmaster().user:
+            return HttpResponseBadRequest('You are not kegmaster')
+        purchase.user = request.user
+        #TODO: take a lock on something (the user?) to prevent a double-purchase
+        # in a race here
+        purchase.save()
+        messages.info(request, "Purchase of {} sucessfully recorded".format(purchase.keg))
+        return HttpResponseRedirect(purchase.keg.get_absolute_url())
+    else:
+        return HttpResponseBadRequest()
+
 
 def register(request):
     if request.method == 'POST':
