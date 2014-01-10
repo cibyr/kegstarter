@@ -66,4 +66,4 @@ class KegMaster(models.Model):
     end = models.DateTimeField(null=True)
 
     def __unicode__(self):
-        return '{0.user} is keg master from {0.1} to {0.2}'.format(self)
+        return '{0.user} is keg master from {0.start} to {0.end}'.format(self)
