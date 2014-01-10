@@ -9,6 +9,9 @@
 <h2>Keg Master (Send donations to this guy/gal)</h2>
 {% if current_kegmaster %}
 <p>{{ current_kegmaster.user.username }}</p>
+{% if user == current_kegmaster.user %}
+<p><a href="{% url 'accept_donation' %}">Accept new donations</a></p>
+{% endif %}
 {% else %}
 <p><strong>There is no current keg-master!</strong></p>
 {% endif %}
