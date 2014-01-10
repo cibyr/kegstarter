@@ -59,3 +59,11 @@ class Vote(models.Model):
 
     def __unicode__(self):
         return '{0.value} votes by {0.user} for {0.keg}'.format(self)
+
+class KegMaster(models.Model):
+    user = models.ForeignKey(User)
+    start = models.DateTimeField(auto_now=True)
+    end = models.DateTimeField(null=True)
+
+    def __unicode__(self):
+        return '{0.user} is keg master from {0.1} to {0.2}'.format(self)
