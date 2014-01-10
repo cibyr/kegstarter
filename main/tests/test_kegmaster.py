@@ -107,3 +107,29 @@ class KegMasterTestCase(TestCase):
         second_master.end = self.now - timedelta(seconds=1)
         second_master.save()
         self.assertEqual(get_current_kegmaster(), first_master)
+
+    def testMultipleKegMasterTable6(self):
+        first_master = KegMaster()
+        first_master.user = self.kegop
+        first_master.start = self.now - timedelta(days=1)
+        first_master.end = self.now + timedelta(days=1)
+        first_master.save()
+        second_master = KegMaster()
+        second_master.user = self.drinker
+        second_master.start = self.now + timedelta(days=1)
+        second_master.end = self.now + timedelta(days=2)
+        second_master.save()
+        self.assertEqual(get_current_kegmaster(), first_master)
+
+    def testMultipleKegMasterTable7(self):
+        first_master = KegMaster()
+        first_master.user = self.kegop
+        first_master.start = self.now + timedelta(days=1)
+        first_master.end = self.now + timedelta(days=2)
+        first_master.save()
+        second_master = KegMaster()
+        second_master.user = self.drinker
+        second_master.start = self.now - timedelta(days=1)
+        second_master.end = self.now + timedelta(days=1)
+        second_master.save()
+        self.assertEqual(get_current_kegmaster(), second_master)
