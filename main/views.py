@@ -45,8 +45,9 @@ def fund_context():
     }
 
 def home(request):
-    recent_kegs = Keg.objects.order_by('-added')[:3]
-    winning_kegs = Keg.objects.annotate(votes=Sum('vote__value')).order_by('-votes')[:3]
+    not_purchased = Keg.objects.filter(purchase=None)
+    recent_kegs = not_purchased.order_by('-added')[:3]
+    winning_kegs = not_purchased.annotate(votes=Sum('vote__value')).order_by('-votes')
     context = {
         'kegs': recent_kegs,
         'winning_kegs': winning_kegs,

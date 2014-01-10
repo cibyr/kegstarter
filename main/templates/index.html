@@ -23,7 +23,7 @@
 {% endfor %}
 </ul>
 
-<h2>Most votes</h2>
+<h2>Keg list</h2>
 <ul>
 {% for keg in winning_kegs %}
     <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a> (Votes: {{ keg.votes }})</li>
