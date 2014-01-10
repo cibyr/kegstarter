@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 
@@ -31,6 +32,9 @@ class Keg(models.Model):
 
     def get_absolute_url(self):
         return '/keg/{}/{}/{}'.format(self.pk, slugify(self.brewery.name), slugify(self.name))
+
+    def votes(self):
+        return self.vote_set.aggregate(Sum('value'))['value__sum']
 
 class Donation(models.Model):
     class Meta:

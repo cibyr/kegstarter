@@ -33,8 +33,10 @@ def fund_context():
 
 def home(request):
     recent_kegs = Keg.objects.order_by('-added')[:3]
+    winning_kegs = Keg.objects.annotate(votes=Sum('vote__value')).order_by('-votes')[:3]
     context = {
         'kegs': recent_kegs,
+        'winning_kegs': winning_kegs,
     }
     context.update(fund_context())
     return render(request, 'index.html', context)
@@ -47,7 +49,6 @@ class KegDetail(DetailView):
         context.update(fund_context())
         if self.request.user.is_authenticated():
             context['user_balance'] = get_user_balance(self.request.user)
-        context['votes'] = sum_queryset_field(self.object.vote_set, 'value')
         return context
 
 @require_POST

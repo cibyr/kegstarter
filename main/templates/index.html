@@ -9,7 +9,14 @@
 <h2>Newly added</h2>
 <ul>
 {% for keg in kegs %}
-    <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a></li>
+    <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a> (Votes: {{ keg.votes }})</li>
+{% endfor %}
+</ul>
+
+<h2>Most votes</h2>
+<ul>
+{% for keg in winning_kegs %}
+    <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a> (Votes: {{ keg.votes }})</li>
 {% endfor %}
 </ul>
 
