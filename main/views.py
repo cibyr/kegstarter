@@ -16,16 +16,12 @@ from .models import Brewery, Keg, Donation, Purchase, KegMaster
 
 def get_current_kegmaster():
     '''Return the latest Keg Master that hasn't ended their shift'''
-    try:
-        latest_kegmaster = KegMaster.objects\
-            .filter(start__lte=datetime.utcnow().replace(tzinfo=utc))\
-            .filter(Q(end__gte=datetime.utcnow().replace(tzinfo=utc)) | Q(end__isnull=True))\
-            .latest('end')
-        if latest_kegmaster is not None:
-            return latest_kegmaster
-    except KegMaster.DoesNotExist:
-        pass
-    return None
+    now = datetime.utcnow().replace(tzinfo=utc)
+    kegmasters = KegMaster.objects.filter(start__lte=now)
+    kegmasters = kegmasters.filter(Q(end__gte=now) | Q(end__isnull=True))
+    latest_kegmaster = kegmasters.order_by('end')
+    if latest_kegmaster:
+        return latest_kegmaster[0]
 
 def sum_queryset_field(qs, field):
     return qs.aggregate(Sum(field))[field+'__sum'] or 0
