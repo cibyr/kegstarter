@@ -15,16 +15,21 @@ class Brewery(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return '/brewery/{}/{}'.format(self.pk, slugify(self.name))
+
 class Keg(models.Model):
     #TODO: images
     #TODO: tags?
     name = models.CharField(max_length=200)
     style = models.CharField(max_length=200)
-    brewery = models.ForeignKey('Brewery')
+    brewery = models.ForeignKey('Brewery', related_name='kegs')
     gallons = models.FloatField(default=15.5,
             help_text='Size of the keg, in US gallons')
     price = CurrencyField(help_text='Cost to purchase this keg, in US dollars')
-    desc = models.TextField()
+    desc = models.TextField(help_text='''Enter as much detail as you like,
+        but be sure to at least include where we can purchase this keg.
+        Markdown is supported for formatting.''')
     added = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
@@ -34,7 +39,7 @@ class Keg(models.Model):
         return '/keg/{}/{}/{}'.format(self.pk, slugify(self.brewery.name), slugify(self.name))
 
     def votes(self):
-        return self.vote_set.aggregate(Sum('value'))['value__sum']
+        return self.vote_set.aggregate(Sum('value'))['value__sum'] or 0
 
 class Donation(models.Model):
     class Meta:

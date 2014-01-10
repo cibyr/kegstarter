@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load markdown_filter %}
+
+{% block title %}{{ brewery }} | Kegstarter{% endblock %}
+
+{% block content %}
+
+<h2>{{ brewery }}</h2>
+
+<table>
+<tr><th>Location</th><td>{{ brewery.location }}</td></tr>
+</table>
+
+{% if brewery.kegs.exists %}
+<h3>Kegs</h3>
+<ul>
+{% for keg in brewery.kegs.all %}
+    <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a> (Votes: {{ keg.votes }})</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<p>{{ brewery.desc|format_markdown}}</p>
+
+{% endblock %}

@@ -6,13 +6,13 @@ from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
 from django.utils.timezone import utc
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView
+from django.views.generic import CreateView, DetailView
 
 from datetime import datetime
 
 
 from .forms import DonationForm, VoteForm
-from .models import Keg, Donation, Purchase, KegMaster
+from .models import Brewery, Keg, Donation, Purchase, KegMaster
 
 def get_current_kegmaster():
     '''Return the latest Keg Master that hasn't ended their shift'''
@@ -68,6 +68,19 @@ class KegDetail(DetailView):
         if self.request.user.is_authenticated():
             context['user_balance'] = get_user_balance(self.request.user)
         return context
+
+
+class KegCreate(CreateView):
+    model = Keg
+
+
+class BreweryDetail(DetailView):
+    model = Brewery
+
+
+class BreweryCreate(CreateView):
+    model = Brewery
+
 
 @require_POST
 @login_required

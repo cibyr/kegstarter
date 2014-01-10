@@ -8,7 +8,7 @@
 <h2>{{ keg }}</h2>
 
 <table>
-<tr><th>Brewery</th><td>{{ keg.brewery }}</td></tr>
+<tr><th>Brewery</th><td><a href="{{ keg.brewery.get_absolute_url }}">{{ keg.brewery }}</a></td></tr>
 <tr><th>Style</th><td>{{ keg.style }}</td></tr>
 <tr><th>Volume</th><td>{{ keg.gallons }} (US gallons)</td></tr>
 <tr><th>Price</th><td>${{ keg.price }}</td></tr>

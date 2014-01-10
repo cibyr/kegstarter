@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load markdown_filter %}
+
+{% block title %}Add a brewery | Kegstarter{% endblock %}
+
+{% block content %}
+
+<h2>Add a brewery</h2>
+
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create" />
+</form>
+
+{% endblock %}
