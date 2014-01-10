@@ -6,6 +6,13 @@
 <p>Spent on beer: ${{ spent }}</p>
 <p>Current balance: ${{ balance }}</p>
 
+<h2>Keg Master (Send donations to this guy/gal)</h2>
+{% if current_kegmaster %}
+<p>{{ current_kegmaster.user.username }}</p>
+{% else %}
+<p><strong>There is no current keg-master!</strong></p>
+{% endif %}
+
 <h2>Newly added</h2>
 <ul>
 {% for keg in kegs %}

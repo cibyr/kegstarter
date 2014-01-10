@@ -7,8 +7,21 @@ from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 
+from datetime import datetime
+
+
 from .forms import DonationForm, VoteForm
-from .models import Keg, Donation, Purchase
+from .models import Keg, Donation, Purchase, KegMaster
+
+def get_current_kegmaster():
+    '''Return the latest Keg Master that hasn't ended their shift'''
+    try:
+        latest_kegmaster = KegMaster.objects.latest('start')
+        if (latest_kegmaster.end is None) or (latest_kegmaster.end > datetime.today()):
+            return latest_kegmaster
+    except KegMaster.DoesNotExist:
+        pass
+    return None
 
 def sum_queryset_field(qs, field):
     return qs.aggregate(Sum(field))[field+'__sum'] or 0
@@ -37,6 +50,7 @@ def home(request):
     context = {
         'kegs': recent_kegs,
         'winning_kegs': winning_kegs,
+        'current_kegmaster': get_current_kegmaster()
     }
     context.update(fund_context())
     return render(request, 'index.html', context)
