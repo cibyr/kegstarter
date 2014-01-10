@@ -50,7 +50,8 @@ def home(request):
     context = {
         'kegs': recent_kegs,
         'winning_kegs': winning_kegs,
-        'current_kegmaster': get_current_kegmaster()
+        'current_kegmaster': get_current_kegmaster(),
+        'purchase_history': get_keg_purchase_history()
     }
     context.update(fund_context())
     return render(request, 'index.html', context)
@@ -127,3 +128,6 @@ def accept_donation(request):
 
 def get_donation_history(user):
     return Donation.objects.filter(recipient__exact=user).order_by('timestamp')
+
+def get_keg_purchase_history():
+    return Purchase.objects.order_by('timestamp')

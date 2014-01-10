@@ -33,4 +33,15 @@
 <p><a href="/keg/create/">Suggest a keg</a></p>
 <p><a href="/brewery/create/">Add a brewery</a></p>
 
+<h2>Purchase history</h2>
+{% if purchase_history.count == 0 %}
+<p>All dry.  Go vote, and buy some kegs!</p>
+{% else %}
+<ul>
+{% for purchase in purchase_history %}
+    <li>{{ purchase.timestamp }} - {{ purchase.user.username }} - <a href="{{ purchase.keg.get_absolute_url }}">{{ purchase.keg }}</a> (${{ purchase.keg.price }}) (Votes: {{ purchase.keg.votes }})</li></li>
+{% endfor %}
+</ul>
+{% endif %}
+
 {% endblock %}
