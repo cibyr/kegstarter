@@ -67,7 +67,7 @@ class Vote(models.Model):
 class KegMaster(models.Model):
     user = models.ForeignKey(User)
     start = models.DateTimeField(auto_now=True)
-    end = models.DateTimeField(null=True)
+    end = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         return '{0.user} is keg master from {0.start} to {0.end}'.format(self)
