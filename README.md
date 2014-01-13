@@ -1,4 +1,4 @@
-![KegStarter](/main/static/logo.png "KegStarter")
+![KegStarter](https://github.com/cibyr/kegstarter/raw/master/main/static/logo.png)
 ==========
 
 A system for spending our beer fund
