@@ -6,7 +6,7 @@ A system for spending our beer fund
 Installing
 ==========
 
-* Ensure `python` and `pip` is installed. See http://www.pip-installer.org/en/latest/installing.html
+* Ensure `python` and `pip` are installed. See http://www.pip-installer.org/en/latest/installing.html
 * Clone the repo.
 * Run:
     
@@ -15,8 +15,8 @@ Installing
 pip install -r requirements.txt
 # Create database tables
 python manage.py syncdb
-# Create a superuser for local administration
-python manage.py createsuperuser
+# Run the database migrations
+python manage.py migrate
 # Start server
 python manage.py runserver
 ```
