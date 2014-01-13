@@ -92,10 +92,6 @@ def create_keg(request):
     return render(request, 'main/keg_form.html', {'form': form})
 
 
-class KegDetail(DetailView):
-    model = Keg
-
-
 class BreweryDetail(DetailView):
     model = Brewery
 
