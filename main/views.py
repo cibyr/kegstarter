@@ -11,7 +11,7 @@ from django.views.generic import CreateView, DetailView
 from datetime import datetime
 
 
-from .forms import DonationForm, VoteForm, PurchaseForm
+from .forms import DonationForm, VoteForm, PurchaseForm, BreweryForm, KegForm
 from .models import Brewery, Keg, Donation, Purchase, KegMaster
 
 def get_current_kegmaster():
@@ -77,7 +77,22 @@ class KegDetail(DetailView):
         return context
 
 
-class KegCreate(CreateView):
+@login_required
+def create_keg(request):
+    if request.method == 'POST':
+        form = KegForm(request.POST)
+        if form.is_valid():
+            keg = form.save(commit=False)
+            keg.proposed_by = request.user
+            keg.save()
+            return HttpResponseRedirect(keg.get_absolute_url())
+    else:
+        form = KegForm()
+
+    return render(request, 'main/keg_form.html', {'form': form})
+
+
+class KegDetail(DetailView):
     model = Keg
 
 
@@ -85,8 +100,19 @@ class BreweryDetail(DetailView):
     model = Brewery
 
 
-class BreweryCreate(CreateView):
-    model = Brewery
+@login_required
+def create_brewery(request):
+    if request.method == 'POST':
+        form = BreweryForm(request.POST)
+        if form.is_valid():
+            brewery = form.save(commit=False)
+            brewery.added_by = request.user
+            brewery.save()
+            return HttpResponseRedirect(brewery.get_absolute_url())
+    else:
+        form = BreweryForm()
+
+    return render(request, 'main/brewery_form.html', {'form': form})
 
 
 @require_POST

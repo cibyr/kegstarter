@@ -11,6 +11,7 @@ class Brewery(models.Model):
     name = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
     desc = models.TextField()
+    added_by = models.ForeignKey(User, null=True)
 
     def __unicode__(self):
         return self.name
@@ -31,6 +32,7 @@ class Keg(models.Model):
         but be sure to at least include where we can purchase this keg.
         Markdown is supported for formatting.''')
     added = models.DateTimeField(auto_now=True)
+    proposed_by = models.ForeignKey(User, null=True)
 
     def __unicode__(self):
         return self.name

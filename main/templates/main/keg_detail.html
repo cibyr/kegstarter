@@ -12,6 +12,9 @@
 <tr><th>Style</th><td>{{ keg.style }}</td></tr>
 <tr><th>Volume</th><td>{{ keg.gallons }} (US gallons)</td></tr>
 <tr><th>Price</th><td>${{ keg.price }}</td></tr>
+{% if keg.proposed_by %}
+<tr><th>Proposed by</th><td>{{ keg.proposed_by }}</td></tr>
+{% endif %}
 </table>
 
 {% if keg.purchase %}

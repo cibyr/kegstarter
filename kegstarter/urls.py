@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 
-from main.views import KegDetail, KegCreate, BreweryDetail, BreweryCreate
+from main.views import KegDetail, BreweryDetail
 
 from django.contrib import admin
 admin.autodiscover()
@@ -9,9 +9,9 @@ urlpatterns = patterns('',
     url(r'^$', 'main.views.home', name='home'),
     url(r'^keg/(?P<pk>\d+)/', KegDetail.as_view(), name='keg'),
     url(r'^keg/purchase/', 'main.views.purchase', name='purchase'),
-    url(r'^keg/create/', KegCreate.as_view(), name='keg_create'),
+    url(r'^keg/create/', 'main.views.create_keg', name='keg_create'),
     url(r'^brewery/(?P<pk>\d+)/', BreweryDetail.as_view(), name='brewery'),
-    url(r'^brewery/create/', BreweryCreate.as_view(), name='brewery_create'),
+    url(r'^brewery/create/', 'main.views.create_brewery', name='brewery_create'),
     url(r'^vote', 'main.views.vote', name='vote'),
 
     url(r'^donations/accept/$', 'main.views.accept_donation', name='accept_donation'),
