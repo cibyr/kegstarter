@@ -71,7 +71,11 @@ class KegDetail(DetailView):
         context.update(fund_context())
         winning_kegs = get_winning_kegs(context['balance'])
         if self.request.user.is_authenticated():
-            context['user_is_current_kegmaster'] = (self.request.user == get_current_kegmaster().user)
+            current_kegmaster = get_current_kegmaster()
+            if current_kegmaster:
+                context['user_is_current_kegmaster'] = (self.request.user == current_kegmaster.user)
+            else:
+                context['user_is_current_kegmaster'] = False
             context['user_balance'] = get_user_balance(self.request.user)
             context['winning'] = (self.object in winning_kegs)
         return context
