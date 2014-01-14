@@ -68,3 +68,8 @@ docs/_build/
 
 # Database
 db.sqlite3
+
+# Don't commit production/beta overrides
+kegstarter/local_settings.py
+
+static/
