@@ -11,7 +11,7 @@ from django.views.generic import CreateView, DetailView
 from datetime import datetime
 
 
-from .forms import DonationForm, VoteForm, PurchaseForm, BreweryForm, KegForm
+from .forms import DonationForm, VoteForm, PurchaseForm, BreweryForm, KegForm, PurchasePriceForm
 from .models import Brewery, Keg, Donation, Purchase, KegMaster
 
 def get_current_kegmaster():
@@ -78,6 +78,8 @@ class KegDetail(DetailView):
                 context['user_is_current_kegmaster'] = False
             context['user_balance'] = get_user_balance(self.request.user)
             context['winning'] = (self.object in winning_kegs)
+            context['purchaseprice_form'] = PurchasePriceForm(instance=self.object)
+            context['purchase_form'] = PurchaseForm(initial={'keg': self.object})
         return context
 
 
@@ -139,8 +141,11 @@ def vote(request):
 @login_required
 def purchase(request):
     form = PurchaseForm(request.POST)
-    if form.is_valid():
+    form_kegprice = PurchasePriceForm(request.POST)
+    if form.is_valid() and form_kegprice.is_valid():
         purchase = form.save(commit=False)
+        kegprice = form_kegprice.save(commit=False)
+        purchase.keg.price = kegprice.price
         # Check that the keg is the current winner
         current_balance = fund_context()['balance']
         if purchase.keg not in get_winning_kegs(current_balance):
@@ -152,6 +157,7 @@ def purchase(request):
         #TODO: take a lock on something (the user?) to prevent a double-purchase
         # in a race here
         purchase.save()
+        purchase.keg.save()
         messages.info(request, "Purchase of {} sucessfully recorded".format(purchase.keg))
         return HttpResponseRedirect(purchase.keg.get_absolute_url())
     else:

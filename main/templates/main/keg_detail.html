@@ -26,8 +26,10 @@
     {% if user_is_current_kegmaster %}
         <form method="post" action="{% url 'purchase' %}">
         {% csrf_token %}
-        <input type="hidden" name="keg" value="{{ keg.id }}">
-        <p>You are the current kegmaster: <input type="submit" value="Click here to confirm that you are buying this keg"></p>
+        {{ purchase_form.keg.as_hidden }}
+        {{ purchaseprice_form }}
+        <br>
+        <input type="submit" value="Click here to confirm that you are buying this keg">
         </form>
     {% endif %}
 {% else %}

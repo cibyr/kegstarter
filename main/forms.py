@@ -1,3 +1,4 @@
+from django.db import models
 from django.forms import ModelForm
 from .models import Donation, Vote, Purchase, Brewery, Keg
 
@@ -15,6 +16,11 @@ class PurchaseForm(ModelForm):
     class Meta:
         model = Purchase
         fields = ['keg']
+
+class PurchasePriceForm(ModelForm):
+    class Meta:
+        model = Keg
+        fields = ['price']
 
 class BreweryForm(ModelForm):
     class Meta:
