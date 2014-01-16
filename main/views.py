@@ -59,7 +59,8 @@ def home(request):
 
 def get_winning_kegs(current_balance):
     buyable_kegs = Keg.objects.filter(price__lte=current_balance)
-    kegs_by_votes = buyable_kegs.annotate(votes=Sum('vote__value'))
+    nonpurchased_kegs = buyable_kegs.filter(purchase=None)
+    kegs_by_votes = nonpurchased_kegs.annotate(votes=Sum('vote__value'))
     max_votes = kegs_by_votes.aggregate(Max('votes'))['votes__max']
     return kegs_by_votes.filter(votes=max_votes)
 
