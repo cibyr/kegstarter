@@ -84,7 +84,7 @@ class PaymentOption(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=200)
     value = models.CharField(max_length=200)
-    info = models.CharField(max_length=200)
+    info = models.CharField(max_length=200, blank=True)
     preferred = models.BooleanField()
 
     def __unicode__(self):
