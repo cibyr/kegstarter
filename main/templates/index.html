@@ -2,46 +2,83 @@
 
 {% block content %}
 
-<p>Total donations: ${{ total_donations }}</p>
-<p>Spent on beer: ${{ spent }}</p>
-<p>Current balance: ${{ balance }}</p>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Current</th>
+            <th>Spent</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tr>
+        <td class="{% if balance > 0 %}success{% else %}danger{% endif %}">${{ balance }}</td>
+        <td>${{ spent }}</td>
+        <td>${{ total_donations }}</td>
+    </tr>
+</table>
 
-<h2>Keg Master (Send donations to this guy/gal)</h2>
-{% if current_kegmaster %}
-<p>{{ current_kegmaster.user.username }}</p>
-{% if user == current_kegmaster.user %}
-<p><a href="{% url 'accept_donation' %}">Accept new donations</a></p>
-{% endif %}
-{% else %}
-<p><strong>There is no current keg-master!</strong></p>
-{% endif %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Keg Master <small>(Send donations to this guy/gal)</small></h2>
+        {% if current_kegmaster %}
+            <h3>{{ current_kegmaster.user.username }}</h3>
+            {% if user == current_kegmaster.user %}
+                <a href="{% url 'accept_donation' %}" class="btn btn-primary">Accept new donations</a>
+            {% endif %}
+        {% else %}
+            <p><strong>There is no current keg-master!</strong></p>
+        {% endif %}
+    </div>
+</div>
 
-<h2>Newly added</h2>
-<ul>
-{% for keg in kegs %}
-    <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a> (Votes: {{ keg.votes }})</li>
-{% endfor %}
-</ul>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Newly Added</h2>
+        <ul class="list-group">
+        {% for keg in kegs %}
+            <a href="{{ keg.get_absolute_url }}" class="list-group-item">
+                {{ keg }}
+                <span class="badge">{{ keg.votes }} votes</span>
+            </a>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
 
-<h2>Keg list</h2>
-<ul>
-{% for keg in winning_kegs %}
-    <li><a href="{{ keg.get_absolute_url }}">{{ keg }}</a> (Votes: {{ keg.votes }})</li>
-{% endfor %}
-</ul>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Keg List</h2>
+        <ul class="list-group">
+        {% for keg in winning_kegs %}
+            <a href="{{ keg.get_absolute_url }}"  class="list-group-item">
+                {{ keg }}
+                <span class="badge">{{ keg.votes }} votes</span>
+            </a>
+        {% endfor %}
+        </ul>
 
-<p><a href="/keg/create/">Suggest a keg</a></p>
-<p><a href="/brewery/create/">Add a brewery</a></p>
+        <a href="/keg/create/" class="btn btn-primary">Suggest a keg</a>
+        <a href="/brewery/create/" class="btn btn-default">Add a brewery</a>
+    </div>
+</div>
 
-<h2>Purchase history</h2>
-{% if purchase_history.count == 0 %}
-<p>All dry.  Go vote, and buy some kegs!</p>
-{% else %}
-<ul>
-{% for purchase in purchase_history %}
-    <li>{{ purchase.timestamp }} - {{ purchase.user.username }} - <a href="{{ purchase.keg.get_absolute_url }}">{{ purchase.keg }}</a> (${{ purchase.keg.price }}) (Votes: {{ purchase.keg.votes }})</li></li>
-{% endfor %}
-</ul>
-{% endif %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>Purchase history</h2>
+        {% if purchase_history.count == 0 %}
+            <p>All dry.  Go vote, and buy some kegs!</p>
+        {% else %}
+            <ul class="list-group">
+            {% for purchase in purchase_history %}
+                <a href="{{ purchase.keg.get_absolute_url }}" class="list-group-item">
+                    {{ purchase.user.username }} purchased "{{ purchase.keg }}"
+                    <span class="label label-success">${{ purchase.keg.price }}</span>
+                    <span class="badge">{{ purchase.keg.votes }} votes</span>
+                </a>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}
