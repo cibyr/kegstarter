@@ -14,7 +14,7 @@
         {% for option in payment_options %}
             <li class="list-group-item">
                 {{ option.name }}: {{ option.value }}
-                <small>({{ option.info }})</small>
+                {% if option.info %}<small>({{ option.info }})</small>{% endif %}
                 {% if option.preferred %}<span class="badge">Preferred</span>{% endif %}
             </li>
         {% endfor %}
