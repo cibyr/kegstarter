@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load markdown_filter %}
+
+{% block title %}{{ keg }} | Kegstarter{% endblock %}
+
+{% block content %}
+
+<h2>{{ user }}</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Payment Options <small>(You cannot remove them right now)</small></h2>
+        <ul class="list-group">
+        {% for option in payment_options %}
+            <li class="list-group-item">
+                {{ option.name }}: {{ option.value }}
+                <small>({{ option.info }})</small>
+                {% if option.preferred %}<span class="badge">Preferred</span>{% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+        <form action="" method="post" role="form" class="form-horizontal">
+            {% csrf_token %}
+            {{ payment_options_form.as_p }}
+            <input type="submit" value="Add Payment Option" />
+        </form>
+    </div>
+</div>
+
+{% endblock %}

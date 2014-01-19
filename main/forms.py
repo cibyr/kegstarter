@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms import ModelForm
-from .models import Donation, Vote, Purchase, Brewery, Keg
+from .models import Donation, Vote, Purchase, Brewery, Keg, PaymentOption
 
 class DonationForm(ModelForm):
     class Meta:
@@ -31,3 +31,9 @@ class KegForm(ModelForm):
     class Meta:
         model = Keg
         exclude = ['proposed_by']
+
+
+class AddPaymentOptionForm(ModelForm):
+    class Meta:
+        model = PaymentOption
+        exclude = ['user']

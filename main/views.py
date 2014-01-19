@@ -11,8 +11,8 @@ from django.views.generic import CreateView, DetailView
 from datetime import datetime
 
 
-from .forms import DonationForm, VoteForm, PurchaseForm, BreweryForm, KegForm, PurchasePriceForm
-from .models import Brewery, Keg, Donation, Purchase, KegMaster
+from .forms import DonationForm, VoteForm, PurchaseForm, BreweryForm, KegForm, PurchasePriceForm, AddPaymentOptionForm
+from .models import Brewery, Keg, Donation, Purchase, KegMaster, PaymentOption
 
 def get_current_kegmaster():
     '''Return the latest Keg Master that hasn't ended their shift'''
@@ -32,6 +32,13 @@ def get_user_balance(user):
     spent = sum_queryset_field(user.vote_set, 'value')
     return int(donation_sum - spent)
 
+
+def get_user_payment_options(user, preferred=False):
+    users_payment_options = PaymentOption.objects.filter(user=user)
+    if preferred:
+        users_payment_options = users_payment_options.filter(preferred=True)
+    return users_payment_options.order_by('preferred').reverse()
+
 def fund_context():
     '''total_donations, spent and balance (used on almost every page)'''
     #TODO: This really should be cached
@@ -48,10 +55,12 @@ def home(request):
     not_purchased = Keg.objects.filter(purchase=None)
     recent_kegs = not_purchased.order_by('-added')[:3]
     winning_kegs = not_purchased.annotate(votes=Sum('vote__value')).order_by('-votes')
+    keg_master = get_current_kegmaster()
     context = {
         'kegs': recent_kegs,
         'winning_kegs': winning_kegs,
-        'current_kegmaster': get_current_kegmaster(),
+        'current_kegmaster': keg_master,
+        'current_kegmaster_payment_options': get_user_payment_options(keg_master, preferred=True),
         'purchase_history': get_keg_purchase_history()
     }
     context.update(fund_context())
@@ -98,6 +107,25 @@ def create_keg(request):
 
     return render(request, 'main/keg_form.html', {'form': form})
 
+
+@login_required
+def profile(request):
+    context = {
+        'payment_options': get_user_payment_options(request.user),
+    }
+    if request.method == 'POST':
+        form = AddPaymentOptionForm(request.POST)
+
+        if form.is_valid():
+            payment_option = form.save(commit=False)
+            payment_option.user = request.user
+            payment_option.save()
+            form = AddPaymentOptionForm()
+    else:
+        form = AddPaymentOptionForm()
+
+    context['payment_options_form'] = form
+    return render(request, 'main/profile.html', context)
 
 class BreweryDetail(DetailView):
     model = Brewery

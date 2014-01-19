@@ -78,3 +78,14 @@ class KegMaster(models.Model):
 
     def __unicode__(self):
         return '{0.user} is keg master from {0.start} to {0.end}'.format(self)
+
+
+class PaymentOption(models.Model):
+    user = models.ForeignKey(User)
+    name = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
+    info = models.CharField(max_length=200)
+    preferred = models.BooleanField()
+
+    def __unicode__(self):
+        return '{0.user}: {0.name} = {0.value} ({0.info})'.format(self)

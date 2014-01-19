@@ -22,6 +22,15 @@
         <h2>Keg Master <small>(Send donations to this guy/gal)</small></h2>
         {% if current_kegmaster %}
             <h3>{{ current_kegmaster.user.username }}</h3>
+            <ul class="list-group">
+            {% for option in current_kegmaster_payment_options %}
+                <li class="list-group-item">
+                    {{ option.name }}: {{ option.value }}
+                    <small>({{ option.info }})</small>
+                    {% if option.preferred %}<span class="badge">Preferred</span>{% endif %}
+                </li>
+            {% endfor %}
+            </ul>
             {% if user == current_kegmaster.user %}
                 <a href="{% url 'accept_donation' %}" class="btn btn-primary">Accept new donations</a>
             {% endif %}
