@@ -41,7 +41,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-6 col-md-push-6">
         <h2>Newly Added</h2>
         <ul class="list-group">
         {% for keg in kegs %}
@@ -51,11 +51,9 @@
             </a>
         {% endfor %}
         </ul>
+        <p><small>Showing 3 most recently added kegs.</small></p>
     </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12">
+    <div class="col-md-6 col-md-pull-6">
         <h2>Keg List</h2>
         <ul class="list-group">
         {% for keg in winning_kegs %}
