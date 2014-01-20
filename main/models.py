@@ -35,12 +35,7 @@ class Keg(models.Model):
     proposed_by = models.ForeignKey(User, null=True)
 
     def __unicode__(self):
-        str_list = [self.name]
-        if self.style:
-            str_list.append(' ({0.style})'.format(self))
-        if self.brewery.name:
-            str_list.append(' - {0}'.format(self.brewery.name))
-        return ''.join(str_list)
+        return self.name
 
     def get_absolute_url(self):
         return '/keg/{}/{}/{}'.format(self.pk, slugify(self.brewery.name), slugify(self.name))
