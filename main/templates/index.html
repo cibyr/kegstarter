@@ -25,9 +25,9 @@
             <ul class="list-group">
             {% for option in current_kegmaster_payment_options %}
                 <li class="list-group-item">
+                    {% if option.preferred %}<span class="badge">Preferred</span>{% endif %}
                     {{ option.name }}: {{ option.value }}
                     {% if option.info %}<small>({{ option.info }})</small>{% endif %}
-                    {% if option.preferred %}<span class="badge">Preferred</span>{% endif %}
                 </li>
             {% endfor %}
             </ul>
@@ -46,8 +46,12 @@
         <ul class="list-group">
         {% for keg in kegs %}
             <a href="{{ keg.get_absolute_url }}" class="list-group-item">
-                {{ keg }}
                 <span class="badge">{{ keg.votes }} votes</span>
+                {{ keg.name }}
+                {% if keg.style %}
+                    ({{ keg.style }})
+                {% endif %}
+                - {{ keg.brewery }}
             </a>
         {% endfor %}
         </ul>
@@ -58,8 +62,12 @@
         <ul class="list-group">
         {% for keg in winning_kegs %}
             <a href="{{ keg.get_absolute_url }}"  class="list-group-item">
-                {{ keg }}
                 <span class="badge">{{ keg.votes }} votes</span>
+                {{ keg.name }}
+                {% if keg.style %}
+                    ({{ keg.style }})
+                {% endif %}
+                - {{ keg.brewery }}
             </a>
         {% endfor %}
         </ul>
@@ -78,9 +86,10 @@
             <ul class="list-group">
             {% for purchase in purchase_history %}
                 <a href="{{ purchase.keg.get_absolute_url }}" class="list-group-item">
-                    {{ purchase.user.username }} purchased "{{ purchase.keg }}"
-                    <span class="label label-success">${{ purchase.keg.price }}</span>
                     <span class="badge">{{ purchase.keg.votes }} votes</span>
+                    <h4>{{ purchase.keg }}</h4>
+                    <p><strong>{{ purchase.user.username }}</strong>
+                        purchased for <span class="label label-success">${{ purchase.keg.price }}</span></p>
                 </a>
             {% endfor %}
             </ul>
