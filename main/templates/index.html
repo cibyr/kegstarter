@@ -21,7 +21,9 @@
     <div class="col-md-12">
         <h2>Keg Master <small>(Send donations to this guy/gal)</small></h2>
         {% if current_kegmaster %}
-            <h3>{{ current_kegmaster.user.username }}</h3>
+            <h3><a href="/accounts/{{ current_kegmaster.user.id }}/profile/{{ current_kegmaster.user.username }}">
+                {{ current_kegmaster.user.username }}
+            </a></h3>
             <ul class="list-group">
             {% for option in current_kegmaster_payment_options %}
                 <li class="list-group-item">

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import User
 from django.db.models import Sum, Max, Q
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
@@ -109,22 +110,33 @@ def create_keg(request):
 
 
 @login_required
-def profile(request):
+def profile(request, user_id):
+    try:
+        requested_user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        requested_user = request.user
+
     context = {
-        'payment_options': get_user_payment_options(request.user),
+        'payment_options': get_user_payment_options(requested_user),
+        'requested_user': requested_user
     }
-    if request.method == 'POST':
-        form = AddPaymentOptionForm(request.POST)
 
-        if form.is_valid():
-            payment_option = form.save(commit=False)
-            payment_option.user = request.user
-            payment_option.save()
+    # Only display form is it's same user
+    if requested_user.id is request.user.id:
+        context['same_user'] = True
+        if request.method == 'POST':
+            form = AddPaymentOptionForm(request.POST)
+
+            if form.is_valid():
+                payment_option = form.save(commit=False)
+                payment_option.user = request.user
+                payment_option.save()
+                form = AddPaymentOptionForm()
+        else:
             form = AddPaymentOptionForm()
-    else:
-        form = AddPaymentOptionForm()
 
-    context['payment_options_form'] = form
+        context['payment_options_form'] = form
+
     return render(request, 'main/profile.html', context)
 
 class BreweryDetail(DetailView):

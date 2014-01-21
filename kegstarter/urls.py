@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 
-from main.views import KegDetail, BreweryDetail
+from main.views import KegDetail, BreweryDetail, profile
 
 from django.contrib import admin
 admin.autodiscover()
@@ -16,7 +16,7 @@ urlpatterns = patterns('',
 
     url(r'^donations/accept/$', 'main.views.accept_donation', name='accept_donation'),
 
-    url(r'^accounts/profile$', 'main.views.profile', name='profile'),
+    url(r'^accounts/(?P<user_id>\d+)/profile/', 'main.views.profile', name='profile'),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     (r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
     url(r'^accounts/register/$', 'main.views.register', name='register'),

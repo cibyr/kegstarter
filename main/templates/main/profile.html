@@ -5,11 +5,12 @@
 
 {% block content %}
 
-<h2>{{ user }}</h2>
+<h2>{{ requested_user }}</h2>
 
 <div class="row">
     <div class="col-md-12">
         <h2>Payment Options <small>(You cannot remove them right now)</small></h2>
+        {% if payment_options|length > 0 %}
         <ul class="list-group">
         {% for option in payment_options %}
             <li class="list-group-item">
@@ -19,11 +20,16 @@
             </li>
         {% endfor %}
         </ul>
+        {% else %}
+        <p>Looks like {% if same_user %}you{% else %}they{% endif %} haven't set up any payments yet!</p>
+        {% endif %}
+        {% if same_user %}
         <form action="" method="post" role="form" class="form-horizontal">
             {% csrf_token %}
             {{ payment_options_form.as_p }}
             <input type="submit" value="Add Payment Option" />
         </form>
+        {% endif %}
     </div>
 </div>
 
