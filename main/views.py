@@ -114,7 +114,7 @@ def profile(request, user_id):
     }
 
     # Only display form is it's same user
-    if requested_user.id is request.user.id:
+    if requested_user == request.user:
         context['same_user'] = True
         if request.method == 'POST':
             form = AddPaymentOptionForm(request.POST)
