@@ -49,7 +49,7 @@ def home(request):
     recent_kegs = not_purchased.order_by('-added')[:3]
     winning_kegs = not_purchased.annotate(votes_sum=Sum('vote__value')).order_by('-votes_sum')
     keg_master = get_current_kegmaster()
-    payment_options = get_user_payment_options(keg_master, preferred=True)
+    payment_options = get_user_payment_options(keg_master.user, preferred=True)
     # Simple regex to censor any emails on the front page since you don't need to be
     # logged in to view.  This will help our users from bots scraping for emails.
     for payment in payment_options:
