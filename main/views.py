@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from django.views.generic import CreateView, DetailView
 
 from datetime import datetime
-
+from re import match
 
 from .forms import DonationForm, VoteForm, PurchaseForm, BreweryForm, KegForm, PurchasePriceForm, AddPaymentOptionForm
 from .models import Brewery, Keg, Donation, Purchase, KegMaster, PaymentOption
@@ -49,11 +49,18 @@ def home(request):
     recent_kegs = not_purchased.order_by('-added')[:3]
     winning_kegs = not_purchased.annotate(votes_sum=Sum('vote__value')).order_by('-votes_sum')
     keg_master = get_current_kegmaster()
+    payment_options = get_user_payment_options(keg_master, preferred=True)
+    # Simple regex to censor any emails on the front page since you don't need to be
+    # logged in to view.  This will help our users from bots scraping for emails.
+    for payment in payment_options:
+        if match(r"[^@]+@[^@]+\.[^@]+", payment.value):
+            payment.value = "Email Address Censored"
+            payment.info = "Go to user's account to view"
     context = {
         'kegs': recent_kegs,
         'winning_kegs': winning_kegs,
         'current_kegmaster': keg_master,
-        'current_kegmaster_payment_options': get_user_payment_options(keg_master, preferred=True),
+        'current_kegmaster_payment_options': payment_options,
         'purchase_history': get_keg_purchase_history()
     }
     context.update(fund_context())
