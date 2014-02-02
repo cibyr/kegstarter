@@ -24,12 +24,15 @@
 {% elif winning %}
     <p>This keg is the current candidate for the next purchase.</p>
     {% if user_is_current_kegmaster %}
-        <form method="post" action="{% url 'purchase' %}">
-        {% csrf_token %}
-        {{ purchase_form.keg.as_hidden }}
-        {{ purchaseprice_form }}
-        <br>
-        <input type="submit" value="Click here to confirm that you are buying this keg">
+        <form role="form" method="post" action="{% url 'purchase' %}">
+            {% csrf_token %}
+            {{ purchase_form.keg.as_hidden }}
+            <div class="form-group">
+                {{ purchaseprice_form }}
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary" type="submit" value="Click here to confirm that you are buying this keg">
+            </div>
         </form>
     {% endif %}
 {% else %}
@@ -45,16 +48,26 @@
     {# TODO: AJAX the voting #}
     <h3>Vote for this keg:</h3>
     {% if user_balance > 0 %}
-        <form method="post" action="{% url 'vote' %}">
-        {% csrf_token %}
-        <input type="hidden" name="keg" value="{{ keg.id }}">
-        <p><input type="number" name="value" value="1" size="2"> times <input type="submit" value="VOTE"></p>
+        <form role="form" method="post" action="{% url 'vote' %}">
+            {% csrf_token %}
+            <input type="hidden" name="keg" value="{{ keg.id }}">
+            <div class="form-group">
+                <div class="input-group">
+                <input class="form-control" type="number" name="value" value="1" size="2">
+                <span class="input-group-addon">votes</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary" type="submit" value="VOTE">
+            </div>
         </form>
-        <form method="post" action="{% url 'vote' %}">
-        {% csrf_token %}
-        <input type="hidden" name="keg" value="{{ keg.id }}">
-        <input type="hidden" name="value" value="{{ user_balance }}">
-        <p><input type="submit" value="Use ALL MY VOTES on this keg"></p>
+        <form role="form" method="post" action="{% url 'vote' %}">
+            {% csrf_token %}
+            <input type="hidden" name="keg" value="{{ keg.id }}">
+            <input type="hidden" name="value" value="{{ user_balance }}">
+            <div class="form-group">
+                <input class="btn btn-default" type="submit" value="Use ALL MY VOTES on this keg">
+            </div>
         </form>
     {% else %}
         <p>Donate to vote on this keg.</p>
