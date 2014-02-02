@@ -37,3 +37,9 @@ class AddPaymentOptionForm(ModelForm):
     class Meta:
         model = PaymentOption
         exclude = ['user']
+
+
+class DeletePaymentOptionForm(ModelForm):
+    class Meta:
+        model = PaymentOption
+        fields = ['id']

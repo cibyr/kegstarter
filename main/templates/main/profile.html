@@ -14,6 +14,11 @@
         <ul class="list-group">
         {% for option in payment_options %}
             <li class="list-group-item">
+                <form class="pull-right" action="{% url 'payment_delete' user_id=requested_user.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ option.id }}">
+                    <button class="close" style="margin-left:10px" type="submit">&times;</button>
+                </form>
                 {% if option.preferred %}<span class="badge">Preferred</span>{% endif %}
                 {{ option.name }}: {{ option.value }}
                 {% if option.info %}<small>({{ option.info }})</small>{% endif %}

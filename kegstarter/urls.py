@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^donations/accept/$', 'main.views.accept_donation', name='accept_donation'),
 
     url(r'^accounts/(?P<user_id>\d+)/profile/', 'main.views.profile', name='profile'),
+    url(r'^accounts/(?P<user_id>\d+)/payments/delete', 'main.payments.delete', name='payment_delete'),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     (r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
     url(r'^accounts/register/$', 'main.views.register', name='register'),
