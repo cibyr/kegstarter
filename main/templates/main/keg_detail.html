@@ -48,7 +48,7 @@
         <form method="post" action="{% url 'vote' %}">
         {% csrf_token %}
         <input type="hidden" name="keg" value="{{ keg.id }}">
-        <p><input type="text" name="value" value="1" size="2"> times <input type="submit" value="VOTE"></p>
+        <p><input type="number" name="value" value="1" size="2"> times <input type="submit" value="VOTE"></p>
         </form>
         <form method="post" action="{% url 'vote' %}">
         {% csrf_token %}
