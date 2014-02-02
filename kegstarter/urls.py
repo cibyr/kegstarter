@@ -11,7 +11,6 @@ urlpatterns = patterns('',
     url(r'^keg/purchase/', 'main.views.purchase', name='purchase'),
     url(r'^keg/create/', 'main.views.create_keg', name='keg_create'),
     url(r'^brewery/(?P<pk>\d+)/', BreweryDetail.as_view(), name='brewery'),
-    url(r'^brewery/create/', 'main.views.create_brewery', name='brewery_create'),
     url(r'^vote', 'main.views.vote', name='vote'),
 
     url(r'^donations/accept/$', 'main.views.accept_donation', name='accept_donation'),
@@ -23,4 +22,8 @@ urlpatterns = patterns('',
     url(r'^accounts/register/$', 'main.views.register', name='register'),
 
     url(r'^admin/', include(admin.site.urls)),
+
+    #Untappd API
+    url(r'^api/untappd/auth', 'main.api.untappd.auth', name='untappd_auth'),
+    url(r'^api/(?P<api_v>\d+)/search_beer', 'main.api.untappd.search_beer_view', name='beer_search')
 )

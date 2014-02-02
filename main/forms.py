@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms import ModelForm
-from .models import Donation, Vote, Purchase, Brewery, Keg, PaymentOption
+from .models import Donation, Vote, Purchase, Brewery, Keg, PaymentOption, Suggestion
 
 class DonationForm(ModelForm):
     class Meta:
@@ -10,22 +10,17 @@ class DonationForm(ModelForm):
 class VoteForm(ModelForm):
     class Meta:
         model = Vote
-        fields = ['keg', 'value']
+        fields = ['suggestion', 'value']
 
 class PurchaseForm(ModelForm):
     class Meta:
         model = Purchase
-        fields = ['keg']
+        fields = ['suggestion']
 
 class PurchasePriceForm(ModelForm):
     class Meta:
-        model = Keg
+        model = Suggestion
         fields = ['price']
-
-class BreweryForm(ModelForm):
-    class Meta:
-        model = Brewery
-        exclude = ['added_by']
 
 class KegForm(ModelForm):
     class Meta:

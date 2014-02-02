@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% load markdown_filter %}
 
-{% block title %}{{ keg }} | Kegstarter{% endblock %}
+{% block title %}{{ suggestion.untappd_keg.keg }} | Kegstarter{% endblock %}
 
 {% block content %}
 
-<h2>{{ keg }}</h2>
+<h2>{{ suggestion.untappd_keg.keg }}</h2>
 
 <table>
-<tr><th>Brewery</th><td><a href="{{ keg.brewery.get_absolute_url }}">{{ keg.brewery }}</a></td></tr>
-<tr><th>Style</th><td>{{ keg.style }}</td></tr>
-<tr><th>Volume</th><td>{{ keg.gallons }} (US gallons)</td></tr>
-<tr><th>Price</th><td>${{ keg.price }}</td></tr>
-{% if keg.proposed_by %}
-<tr><th>Proposed by</th><td>{{ keg.proposed_by }}</td></tr>
+<tr><th>Brewery</th><td><a href="{{ suggestion.untappd_keg.untappd_brewery.get_absolute_url }}">{{ suggestion.untappd_keg.untappd_brewery.brewery }}</a></td></tr>
+<tr><th>Style</th><td>{{ suggestion.untappd_keg.keg.style }}</td></tr>
+<tr><th>Volume</th><td>{{ suggestion.gallons }} (US gallons)</td></tr>
+<tr><th>Price</th><td>${{ suggestion.price }}</td></tr>
+{% if suggestion.proposed_by %}
+<tr><th>Proposed by</th><td>{{ suggestion.proposed_by }}</td></tr>
 {% endif %}
 </table>
 
-{% if keg.purchase %}
-    <p>This keg has been purchased by {{ keg.purchase.user }} on {{ keg.purchase.timestamp }}</p>
-{% elif keg.price > balance %}
+{% if suggestion.purchase %}
+    <p>This keg has been purchased by {{ suggestion.purchase.user }} on {{ suggestion.purchase.timestamp }}</p>
+{% elif suggestion.price > balance %}
     <p>We can't afford this keg right now.</p>
 {% elif winning %}
     <p>This keg is the current candidate for the next purchase.</p>
     {% if user_is_current_kegmaster %}
         <form role="form" method="post" action="{% url 'purchase' %}">
             {% csrf_token %}
-            {{ purchase_form.keg.as_hidden }}
+            {{ purchase_form.suggestion.as_hidden }}
             <div class="form-group">
                 {{ purchaseprice_form }}
             </div>
@@ -39,18 +39,18 @@
     {# TODO: Show this keg's current position in the voting #}
 {% endif %}
 
-<p>This keg currently has {{ keg.votes }} votes.</p>
+<p>This keg currently has {{ suggestion.votes }} votes.</p>
 
 <h2>Description</h2>
-<p>{{ keg.desc|format_markdown}}</p>
+<p>{{ suggestion.untappd_keg.keg.desc|format_markdown}}</p>
 
-{% if user.is_authenticated and not keg.purchase %}
+{% if user.is_authenticated and not suggestion.purchase %}
     {# TODO: AJAX the voting #}
     <h3>Vote for this keg:</h3>
     {% if user_balance > 0 %}
         <form role="form" method="post" action="{% url 'vote' %}">
             {% csrf_token %}
-            <input type="hidden" name="keg" value="{{ keg.id }}">
+            <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
             <div class="form-group">
                 <div class="input-group">
                 <input class="form-control" type="number" name="value" value="1" size="2">
@@ -63,7 +63,7 @@
         </form>
         <form role="form" method="post" action="{% url 'vote' %}">
             {% csrf_token %}
-            <input type="hidden" name="keg" value="{{ keg.id }}">
+            <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
             <input type="hidden" name="value" value="{{ user_balance }}">
             <div class="form-group">
                 <input class="btn btn-default" type="submit" value="Use ALL MY VOTES on this keg">

@@ -12,9 +12,11 @@ from django.views.generic import CreateView, DetailView
 from datetime import datetime
 from re import match
 
-from .forms import DonationForm, VoteForm, PurchaseForm, BreweryForm, KegForm, PurchasePriceForm, AddPaymentOptionForm
-from .models import Brewery, Keg, Donation, Purchase, KegMaster, PaymentOption
+from .forms import DonationForm, VoteForm, PurchaseForm, KegForm, PurchasePriceForm, AddPaymentOptionForm
+from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion
 from .shared import sum_queryset_field, get_user_balance
+
+from main.api.untappd import *
 
 def get_current_kegmaster():
     '''Return the latest Keg Master that hasn't ended their shift'''
@@ -36,7 +38,7 @@ def fund_context():
     '''total_donations, spent and balance (used on almost every page)'''
     #TODO: This really should be cached
     total_donations = sum_queryset_field(Donation.objects.all(), 'amount')
-    spent = sum_queryset_field(Purchase.objects.all(), 'keg__price')
+    spent = sum_queryset_field(Purchase.objects.all(), 'suggestion__price')
     balance =  total_donations - spent
     return {
         'total_donations': total_donations,
@@ -45,9 +47,9 @@ def fund_context():
     }
 
 def home(request):
-    not_purchased = Keg.objects.filter(purchase=None)
-    recent_kegs = not_purchased.order_by('-added')[:3]
-    winning_kegs = not_purchased.annotate(votes_sum=Sum('vote__value')).order_by('-votes_sum')
+    not_purchased = Suggestion.objects.filter(purchase=None)
+    recent_suggestions = not_purchased.order_by('-timestamp')[:3]
+    winning_suggestions = not_purchased.annotate(votes_sum=Sum('vote__value')).order_by('-votes_sum')
     keg_master = get_current_kegmaster()
     if keg_master is None:
         payment_options = None
@@ -60,29 +62,31 @@ def home(request):
                 payment.value = "Email Address Censored"
                 payment.info = "Go to user's account to view"
     context = {
-        'kegs': recent_kegs,
-        'winning_kegs': winning_kegs,
+        'suggestions': recent_suggestions,
+        'winning_suggestions': winning_suggestions,
         'current_kegmaster': keg_master,
         'current_kegmaster_payment_options': payment_options,
         'purchase_history': get_keg_purchase_history()
     }
     context.update(fund_context())
-    return render(request, 'index.html', context)
+    response = render(request, 'index.html', context)
 
-def get_winning_kegs(current_balance):
-    buyable_kegs = Keg.objects.filter(price__lte=current_balance)
-    nonpurchased_kegs = buyable_kegs.filter(purchase=None)
-    kegs_by_votes = nonpurchased_kegs.annotate(votes=Sum('vote__value'))
-    max_votes = kegs_by_votes.aggregate(Max('votes'))['votes__max']
-    return kegs_by_votes.filter(votes=max_votes)
+    return response
+
+def get_winning_suggestions(current_balance):
+    buyable_suggestions = Suggestion.objects.filter(price__lte=current_balance)
+    nonpurchased_suggestions = buyable_suggestions.filter(purchase=None)
+    suggestions_by_votes = nonpurchased_suggestions.annotate(votes=Sum('vote__value'))
+    max_votes = suggestions_by_votes.aggregate(Max('votes'))['votes__max']
+    return suggestions_by_votes.filter(votes=max_votes)
 
 class KegDetail(DetailView):
-    model = Keg
+    model = Suggestion
 
     def get_context_data(self, **kwargs):
         context = super(KegDetail, self).get_context_data(**kwargs)
         context.update(fund_context())
-        winning_kegs = get_winning_kegs(context['balance'])
+        winning_suggestions = get_winning_suggestions(context['balance'])
         if self.request.user.is_authenticated():
             current_kegmaster = get_current_kegmaster()
             if current_kegmaster:
@@ -90,25 +94,50 @@ class KegDetail(DetailView):
             else:
                 context['user_is_current_kegmaster'] = False
             context['user_balance'] = get_user_balance(self.request.user)
-            context['winning'] = (self.object in winning_kegs)
+            context['winning'] = (self.object in winning_suggestions)
             context['purchaseprice_form'] = PurchasePriceForm(instance=self.object)
-            context['purchase_form'] = PurchaseForm(initial={'keg': self.object})
+            context['purchase_form'] = PurchaseForm(initial={'suggestion': self.object})
         return context
 
 
 @login_required
 def create_keg(request):
+    context = {}
+
     if request.method == 'POST':
-        form = KegForm(request.POST)
-        if form.is_valid():
-            keg = form.save(commit=False)
-            keg.proposed_by = request.user
-            keg.save()
-            return HttpResponseRedirect(keg.get_absolute_url())
+        bid = request.POST.get('bid', None)
+        if bid:
+            untappd_keg = create_untappd_keg(bid)
+
+            suggestion = Suggestion()
+            suggestion.untappd_keg = untappd_keg
+            suggestion.proposed_by = request.user
+            suggestion.price = 0
+            suggestion.gallons = 15.5
+            suggestion.save()
+
+            return HttpResponseRedirect(suggestion.get_absolute_url())
+
+        return HttpResponseRedirect(reverse('keg_create'))
     else:
         form = KegForm()
 
-    return render(request, 'main/keg_form.html', {'form': form})
+        token = get_user_token(request.user)
+        untappd_api = init_api(redirect_url=UNTAPPD_REDIRECT_URL, access_token=token)
+
+        context['untappd_has_token'] = (token is not None)
+        if token is None:
+            context['untappd_auth_url'] = get_auth_url(untappd_api)
+        else:
+            context['recent_checkins'] = get_recent_checkins(untappd_api)
+
+        beer = request.GET.get('beer', None)
+        if beer:
+            context['search'] = beer
+            context['search_results'] = search_beer(beer)
+
+    context['form'] = form
+    return render(request, 'main/keg_form.html', context)
 
 
 @login_required
@@ -142,22 +171,13 @@ def profile(request, user_id):
     return render(request, 'main/profile.html', context)
 
 class BreweryDetail(DetailView):
-    model = Brewery
+    model = UntappdBrewery
 
+    def get_context_data(self, **kwargs):
+        context = super(BreweryDetail, self).get_context_data(**kwargs)
 
-@login_required
-def create_brewery(request):
-    if request.method == 'POST':
-        form = BreweryForm(request.POST)
-        if form.is_valid():
-            brewery = form.save(commit=False)
-            brewery.added_by = request.user
-            brewery.save()
-            return HttpResponseRedirect(brewery.get_absolute_url())
-    else:
-        form = BreweryForm()
-
-    return render(request, 'main/brewery_form.html', {'form': form})
+        context['untappd_kegs'] = UntappdKeg.objects.filter(untappd_brewery__exact=context['object'])
+        return context
 
 
 @require_POST
@@ -174,8 +194,8 @@ def vote(request):
         else:
             vote.save()
             messages.info(request, "{} vote{} for {} sucessfully recorded".format(
-                vote.value, 's' if vote.value > 1 else '', vote.keg))
-        return HttpResponseRedirect(vote.keg.get_absolute_url())
+                vote.value, 's' if vote.value > 1 else '', vote.suggestion.untappd_keg))
+        return HttpResponseRedirect(vote.suggestion.get_absolute_url())
     else:
         return HttpResponseBadRequest()
 
@@ -188,10 +208,10 @@ def purchase(request):
     if form.is_valid() and form_kegprice.is_valid():
         purchase = form.save(commit=False)
         kegprice = form_kegprice.save(commit=False)
-        purchase.keg.price = kegprice.price
+        purchase.suggestion.price = kegprice.price
         # Check that the keg is the current winner
         current_balance = fund_context()['balance']
-        if purchase.keg not in get_winning_kegs(current_balance):
+        if purchase.suggestion not in get_winning_suggestions(current_balance):
             return HttpResponseBadRequest('Not the winning keg')
         # Check that the user is the current kegmaster
         if request.user != get_current_kegmaster().user:
@@ -200,9 +220,9 @@ def purchase(request):
         #TODO: take a lock on something (the user?) to prevent a double-purchase
         # in a race here
         purchase.save()
-        purchase.keg.save()
-        messages.info(request, "Purchase of {} sucessfully recorded".format(purchase.keg))
-        return HttpResponseRedirect(purchase.keg.get_absolute_url())
+        purchase.suggestion.save()
+        messages.info(request, "Purchase of {} successfully recorded".format(purchase.suggestion.untappd_keg))
+        return HttpResponseRedirect(purchase.suggestion.get_absolute_url())
     else:
         return HttpResponseBadRequest()
 

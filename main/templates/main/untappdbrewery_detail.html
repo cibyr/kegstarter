@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load markdown_filter %}
+
+{% block title %}{{ untappdbrewery.brewery }} | Kegstarter{% endblock %}
+
+{% block content %}
+
+<h2>{{ untappdbrewery.brewery }}</h2>
+
+<table>
+<tr><th>Location</th><td>{{ untappdbrewery.brewery.location }}</td></tr>
+</table>
+
+{% if untappd_kegs %}
+<h3>Kegs (That have been suggested)</h3>
+<ul>
+{% for untappd_keg in untappd_kegs %}
+    <li>{{ untappd_keg.keg }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<p>{{ untappdbrewery.brewery.desc|format_markdown}}</p>
+
+{% endblock %}

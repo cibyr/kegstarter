@@ -1,17 +1,101 @@
 {% extends "base.html" %}
 {% load markdown_filter %}
+{% load static %}
 
 {% block title %}Suggest a keg | Kegstarter{% endblock %}
 
 {% block content %}
 
-<h2>Suggest a keg</h2>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Suggest a Keg</h2>
+    </div>
+</div>
 
-<form action="" method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Create" />
-</form>
-
-<p><a href="/brewery/create/">Add a brewery</a></p>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Search Untappd</h3>
+        <form role="form" action="" method="get">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="beer" class="form-control" id="beer-search" name="beer" placeholder="Enter beer" value="">
+                    <div class="input-group-btn">
+                        <button class="btn btn-primary" style="height:38px" type="submit">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="list-group">
+            {% if search %}
+            {% for result in search_results.beers.items %}
+            <form class="list-group-item" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="bid" value="{{ result.beer.bid }}">
+                <button type="submit">
+                    <div class="pull-left" style="margin-right:10px">
+                        <img class="img-thumbnail" src="{{ result.beer.beer_label }}" alt="" width="75" height="75">
+                    </div>
+                    <div class="pull-left">
+                        <!-- Spacing fix for mobile phones --><div class="visible-xs" style="margin-top:10px"></div>
+                        <h4 class="list-group-item-heading">{{ result.beer.beer_name }}</h4>
+                        <h5 class="list-group-item-heading">{{ result.brewery.brewery_name }}</h5>
+                        <h5 class="list-group-item-heading">({{ result.beer.beer_style }})</h5>
+                        <p class="list-group-item-text">
+                            Check-ins: {{ result.checkin_count }}
+                            {% if result.have_had %}
+                                (You had this {{ result.your_count}} time{% if result.your_count != 1 %}s{% endif %})
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="clearfix"></div>
+                </button>
+            </form>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h3>Your Recent Untappd Checkins</h3>
+        <div class="list-group">
+            {% if untappd_has_token %}
+            {% for checkin in recent_checkins.checkins.items %}
+            <form class="list-group-item" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="bid" value="{{ checkin.beer.bid }}">
+                <button type="submit">
+                    <div class="pull-left" style="margin-right:10px">
+                        <img class="img-thumbnail" src="{{ checkin.beer.beer_label }}" alt="" width="75" height="75">
+                    </div>
+                    <div class="pull-left">
+                        <!-- Spacing fix for mobile phones --><div class="visible-xs" style="margin-top:10px"></div>
+                        <h4 class="list-group-item-heading">{{ checkin.beer.beer_name }}</h4>
+                        <h5 class="list-group-item-heading">{{ checkin.brewery.brewery_name }}</h5>
+                        <h5 class="list-group-item-heading">({{ checkin.beer.beer_style }})</h5>
+                        <p class="list-group-item-text">
+                            {% if checkin.checkin_comment %}{{ checkin.checkin_comment }}{% endif %}
+                            Rating: {{ checkin.rating_score }}
+                        </p>
+                    </div>
+                    <div class="clearfix"></div>
+                </button>
+            </form>
+            {% endfor %}
+            {% else %}
+            <a class="list-group-item" href="{{ untappd_auth_url }}">
+                <div class="pull-left" style="margin-right:10px">
+                    <img class="img-rounded" src="{% static 'untappd/Untappd.png' %}" alt="">
+                </div>
+                <div class="pull-left">
+                    <!-- Spacing fix for mobile phones --><div class="visible-xs" style="margin-top:10px"></div>
+                    <h4 class="list-group-item-heading">Log In to Untappd</h4>
+                </div>
+                <div class="clearfix"></div>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 {% endblock %}

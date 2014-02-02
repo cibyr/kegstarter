@@ -90,6 +90,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Untappd API keys (override in local_settings.py)
+UNTAPPD_CLIENT_ID = ''
+UNTAPPD_CLIENT_SECRET = ''
+UNTAPPD_REDIRECT_URL = ''
+UNTAPPD_COOKIE = 'untappd_token'
+
 # Import overrides from local_settings.py
 # DO NOT ADD ANYTHING BELOW THIS!
 try:

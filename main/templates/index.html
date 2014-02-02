@@ -46,14 +46,14 @@
     <div class="col-md-6 col-md-push-6">
         <h2>Newly Added</h2>
         <ul class="list-group">
-        {% for keg in kegs %}
-            <a href="{{ keg.get_absolute_url }}" class="list-group-item">
-                <span class="badge">{{ keg.votes }} votes</span>
-                {{ keg.name }}
-                {% if keg.style %}
-                    ({{ keg.style }})
+        {% for suggestion in suggestions %}
+            <a href="{{ suggestion.get_absolute_url }}" class="list-group-item">
+                <span class="badge">{{ suggestion.votes }} votes</span>
+                {{ suggestion.untappd_keg.keg.name }}
+                {% if suggestion.untappd_keg.keg.style %}
+                    ({{ suggestion.untappd_keg.keg.style }})
                 {% endif %}
-                - {{ keg.brewery }}
+                - {{ suggestion.untappd_keg.untappd_brewery.brewery }}
             </a>
         {% endfor %}
         </ul>
@@ -62,20 +62,19 @@
     <div class="col-md-6 col-md-pull-6">
         <h2>Keg List</h2>
         <ul class="list-group">
-        {% for keg in winning_kegs %}
-            <a href="{{ keg.get_absolute_url }}"  class="list-group-item">
-                <span class="badge">{{ keg.votes }} votes</span>
-                {{ keg.name }}
-                {% if keg.style %}
-                    ({{ keg.style }})
+        {% for suggestion in winning_suggestions %}
+            <a href="{{ suggestion.get_absolute_url }}"  class="list-group-item">
+                <span class="badge">{{ suggestion.votes }} votes</span>
+                {{ suggestion.untappd_keg.keg.name }}
+                {% if suggestion.untappd_keg.keg.style %}
+                    ({{ suggestion.untappd_keg.keg.style }})
                 {% endif %}
-                - {{ keg.brewery }}
+                - {{ suggestion.untappd_keg.untappd_brewery.brewery }}
             </a>
         {% endfor %}
         </ul>
 
         <a href="/keg/create/" class="btn btn-primary">Suggest a keg</a>
-        <a href="/brewery/create/" class="btn btn-default">Add a brewery</a>
     </div>
 </div>
 
@@ -87,11 +86,11 @@
         {% else %}
             <ul class="list-group">
             {% for purchase in purchase_history %}
-                <a href="{{ purchase.keg.get_absolute_url }}" class="list-group-item">
-                    <span class="badge">{{ purchase.keg.votes }} votes</span>
-                    <h4>{{ purchase.keg }}</h4>
+                <a href="{{ purchase.suggestion.get_absolute_url }}" class="list-group-item">
+                    <span class="badge">{{ purchase.suggestion.votes }} votes</span>
+                    <h4>{{ purchase.suggestion.untappd_keg.keg }}</h4>
                     <p><strong>{{ purchase.user.username }}</strong>
-                        purchased for <span class="label label-success">${{ purchase.keg.price }}</span></p>
+                        purchased for <span class="label label-success">${{ purchase.suggestion.price }}</span></p>
                 </a>
             {% endfor %}
             </ul>
