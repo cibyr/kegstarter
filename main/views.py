@@ -259,4 +259,4 @@ def get_donation_history(user):
     return Donation.objects.filter(recipient__exact=user).order_by('timestamp')
 
 def get_keg_purchase_history():
-    return Purchase.objects.order_by('timestamp')
+    return Purchase.objects.order_by('-timestamp')
