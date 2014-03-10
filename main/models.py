@@ -152,6 +152,8 @@ class UntappdCredentials(models.Model):
     token = models.CharField(max_length=200)
     timestamp = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name_plural = "untappd credentials"
+
     def __unicode__(self):
         return 'UntappdCredentials for {}'.format(self.user)
-
