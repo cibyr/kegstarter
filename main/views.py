@@ -109,12 +109,18 @@ def create_keg(request):
         if bid:
             untappd_keg = create_untappd_keg(bid)
 
-            suggestion = Suggestion()
-            suggestion.untappd_keg = untappd_keg
-            suggestion.proposed_by = request.user
-            suggestion.price = 0
-            suggestion.gallons = 15.5
-            suggestion.save()
+            # See if we already have a suggested keg
+            not_purchased = Suggestion.objects.filter(purchase=None)
+            try:
+                suggestion = not_purchased.get(untappd_keg=untappd_keg)
+                messages.info(request, "This keg has already been suggested - vote for it!")
+            except Suggestion.DoesNotExist:
+                suggestion = Suggestion()
+                suggestion.untappd_keg = untappd_keg
+                suggestion.proposed_by = request.user
+                suggestion.price = 0
+                suggestion.gallons = 15.5
+                suggestion.save()
 
             return HttpResponseRedirect(suggestion.get_absolute_url())
 
