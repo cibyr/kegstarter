@@ -135,7 +135,15 @@ def create_keg(request):
         if token is None:
             context['untappd_auth_url'] = get_auth_url(untappd_api)
         else:
-            context['recent_checkins'] = get_recent_checkins(untappd_api)
+            try:
+                context['recent_checkins'] = get_recent_checkins(untappd_api)
+            except InvalidAuth:
+                # Re-setup our Untappd stuff
+                expire_user_token(request.user)
+                untappd_api = init_api(redirect_url=UNTAPPD_REDIRECT_URL)
+                context['untappd_has_token'] = False
+                context['untappd_auth_url'] = get_auth_url(untappd_api)
+
 
         beer = request.GET.get('beer', None)
         if beer:

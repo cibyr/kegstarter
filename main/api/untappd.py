@@ -72,6 +72,16 @@ def get_user_token(user):
         return None
 
 
+def expire_user_token(user):
+    """
+    @type user: User
+    """
+    try:
+        UntappdCredentials.objects.get(user=user).delete()
+    except UntappdCredentials.DoesNotExist:
+         pass
+
+
 def search_beer(beer_name, api_v=1):
     """
     @type api_v: int
