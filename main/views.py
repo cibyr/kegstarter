@@ -193,8 +193,8 @@ def vote(request):
             messages.error("Vote failed: you don't have that many votes")
         else:
             vote.save()
-            messages.info(request, "{} vote{} for {} sucessfully recorded".format(
-                vote.value, 's' if vote.value > 1 else '', vote.suggestion.untappd_keg))
+            messages.info(request, "{} vote{} for {} successfully recorded".format(
+                vote.value, 's' if vote.value > 1 else '', vote.suggestion.untappd_keg.keg()))
         return HttpResponseRedirect(vote.suggestion.get_absolute_url())
     else:
         return HttpResponseBadRequest()
