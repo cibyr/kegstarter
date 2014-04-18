@@ -9,7 +9,7 @@ from django.utils.timezone import utc
 
 class UntappdModel(models.Model):
     untappd_id = models.IntegerField(primary_key=True)
-    expires = models.DateTimeField(auto_now=True)
+    expires = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
     def get_default_expiry():
@@ -82,7 +82,7 @@ class Suggestion(models.Model):
             help_text='Size of the keg, in US gallons')
     price = CurrencyField(help_text='Cost to purchase this keg, in US dollars')
     proposed_by = models.ForeignKey(User, null=True)
-    timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
         return u'/keg/{}/{}/{}'.format(self.pk,
@@ -105,7 +105,7 @@ class Donation(models.Model):
     user = models.ForeignKey(User)
     amount = CurrencyField()
     recipient = models.ForeignKey(User, related_name='donations_received')
-    timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return '${0.amount} from {0.user} to {0.recipient}'.format(self)
@@ -114,14 +114,14 @@ class Donation(models.Model):
 class Purchase(models.Model):
     user = models.ForeignKey(User)
     suggestion = models.OneToOneField(Suggestion)
-    timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Vote(models.Model):
     user = models.ForeignKey(User)
     suggestion = models.ForeignKey(Suggestion)
     value = models.PositiveIntegerField(default=1)
-    timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return '{0.value} votes by {0.user} for {0.keg}'.format(self)
@@ -129,7 +129,7 @@ class Vote(models.Model):
 
 class KegMaster(models.Model):
     user = models.ForeignKey(User)
-    start = models.DateTimeField(auto_now=True)
+    start = models.DateTimeField(auto_now_add=True)
     end = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
@@ -150,7 +150,7 @@ class PaymentOption(models.Model):
 class UntappdCredentials(models.Model):
     user = models.OneToOneField(User, primary_key=True)
     token = models.CharField(max_length=200)
-    timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "untappd credentials"
