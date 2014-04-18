@@ -234,7 +234,7 @@ def purchase(request):
         # in a race here
         purchase.save()
         purchase.suggestion.save()
-        messages.info(request, "Purchase of {} successfully recorded".format(purchase.suggestion.untappd_keg))
+        messages.info(request, "Purchase of {} successfully recorded".format(purchase.suggestion.untappd_keg.keg()))
         return HttpResponseRedirect(purchase.suggestion.get_absolute_url())
     else:
         return HttpResponseBadRequest()
