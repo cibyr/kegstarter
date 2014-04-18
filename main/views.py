@@ -77,8 +77,7 @@ def get_winning_suggestions(current_balance):
     buyable_suggestions = Suggestion.objects.filter(price__lte=current_balance)
     nonpurchased_suggestions = buyable_suggestions.filter(purchase=None)
     suggestions_by_votes = nonpurchased_suggestions.annotate(votes=Sum('vote__value'))
-    max_votes = suggestions_by_votes.aggregate(Max('votes'))['votes__max']
-    return suggestions_by_votes.filter(votes=max_votes)
+    return suggestions_by_votes
 
 class KegDetail(DetailView):
     model = Suggestion
