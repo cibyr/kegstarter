@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}Accept a donation | Kegstarter{% endblock %}
 
@@ -9,28 +10,34 @@
     Accepted ${{ new_donation.amount }} from {{new_donation.user}}.
     {% endif %}
     <h2>Accepting a donation (as {{ user }})</h2>
-    <form action="" method="post">
+    <form class="form-horizontal" action="" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Accept">
+        {{ form | crispy }}
+        <div id="div_id_submit" class="control-group">
+            <input type="submit" value="Accept">
+        </div>
     </form>
     <h2>Donation history</h2>
     {% if donation_history.count == 0 %}
     <p>You don't have any accepted donations.  Start asking people!</p>
     {% else %}
-    <table>
-        <tr>
-            <td>User</td>
-            <td>Donation</td>
-            <td>DateTime</td>
-        </tr>
-        {% for donation in donation_history %}
-        <tr>
-            <td>{{ donation.user }}</td>
-            <td>{{ donation.amount }}</td>
-            <td>{{ donation.timestamp }}</td>
-        </tr>
-        {% endfor %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Donation</th>
+                <th>DateTime</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for donation in donation_history %}
+            <tr>
+                <td>{{ donation.user }}</td>
+                <td>{{ donation.amount }}</td>
+                <td>{{ donation.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
     {% endif %}
 {% else %}
