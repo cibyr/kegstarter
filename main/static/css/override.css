@@ -1,17 +1,19 @@
 body { padding-top: 70px; }
 
-.list-group form {
+/* BEGIN keg form */
+.keg-form {
     padding: 0;
 }
 
-.list-group form:hover {
+.keg-form:hover {
     background-color: #f5f5f5
 }
 
-.list-group form button {
+.keg-button {
     background: none;
     border: none;
     width: 100%;
     padding: 10px 15px;
     text-align: left;
 }
+/* END keg form */

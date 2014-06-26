@@ -30,10 +30,10 @@
         <div class="list-group">
             {% if search %}
             {% for result in search_results.beers.items %}
-            <form class="list-group-item" method="post">
+            <form class="list-group-item keg-form" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="bid" value="{{ result.beer.bid }}">
-                <button type="submit">
+                <button type="submit" class="keg-button">
                     <div class="pull-left" style="margin-right:10px">
                         <img class="img-thumbnail" src="{{ result.beer.beer_label }}" alt="" width="75" height="75">
                     </div>
@@ -61,10 +61,10 @@
         <div class="list-group">
             {% if untappd_has_token %}
             {% for checkin in recent_checkins.checkins.items %}
-            <form class="list-group-item" method="post">
+            <form class="list-group-item keg-form" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="bid" value="{{ checkin.beer.bid }}">
-                <button type="submit">
+                <button type="submit" class="keg-button">
                     <div class="pull-left" style="margin-right:10px">
                         <img class="img-thumbnail" src="{{ checkin.beer.beer_label }}" alt="" width="75" height="75">
                     </div>
