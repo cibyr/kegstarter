@@ -175,7 +175,7 @@ def profile(request, user_id):
                 payment_option = form.save(commit=False)
                 payment_option.user = request.user
                 payment_option.save()
-                form = AddPaymentOptionForm()
+            return HttpResponseRedirect(reverse('profile', args={user_id}))
         else:
             form = AddPaymentOptionForm()
 
