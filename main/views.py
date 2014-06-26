@@ -260,6 +260,7 @@ def accept_donation(request):
             new_donation = form.save(commit=False)
             new_donation.recipient = request.user
             new_donation.save()
+        return HttpResponseRedirect(reverse('accept_donation'))
     form = DonationForm()
     context = {
         'form': form,
