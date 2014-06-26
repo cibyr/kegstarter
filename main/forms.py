@@ -1,8 +1,11 @@
 from django.db import models
-from django.forms import ModelForm
+from django.contrib.auth.models import User
+from django.forms import ModelForm, ModelChoiceField
 from .models import Donation, Vote, Purchase, Brewery, Keg, PaymentOption, Suggestion
 
 class DonationForm(ModelForm):
+    user = ModelChoiceField(queryset=User.objects.order_by('username'))
+
     class Meta:
         model = Donation
         fields = ['user', 'amount']
