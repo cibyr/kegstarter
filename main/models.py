@@ -124,7 +124,7 @@ class Vote(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return '{0.value} votes by {0.user} for {0.keg}'.format(self)
+        return '{0.value} votes by {0.user} for {0.suggestion}'.format(self)
 
 
 class KegMaster(models.Model):
