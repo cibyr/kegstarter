@@ -2,28 +2,62 @@
 
 {% block content %}
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Current</th>
-            <th>Spent</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tr>
-        <td class="{% if balance > 0 %}success{% else %}danger{% endif %}">${{ balance }}</td>
-        <td>${{ spent }}</td>
-        <td>${{ total_donations }}</td>
-    </tr>
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <h2>On Tap <small>you know you're thirsty</small></h2>
+    </div>
+</div>
+<div class="row">
+    {% if on_tap.count == 0 %}
+        <div class="col-md-12">
+        {% if current_kegmaster %}
+            <p>Tell you're Keg Master to buy a keg!</p>
+        {% else %}
+            <p>Appoint someone a Keg Master!  Then, buy some kegs!</p>
+        {% endif %}
+        </div>
+    {% else %}
+        {% for purchase in on_tap %}
+        <div class="col-md-3">
+            <div class="thumbnail">
+                <img src="{{ purchase.suggestion.untappd_keg.keg.image }}" alt="No Image" class="img-rounded">
+                <div class="caption">
+                    <h4>
+                        {{ purchase.suggestion.untappd_keg.keg }}
+                        {% if purchase.suggestion.untappd_keg.keg.style %}
+                            <small>{{ purchase.suggestion.untappd_keg.keg.style }}</small>
+                        {% endif %}
+                    </h4>
+                    <h5>{{ purchase.suggestion.untappd_keg.untappd_brewery.brewery }}</h5>
+                    <div>
+                        <a href="{{ purchase.suggestion.get_absolute_url }}" class="btn btn-sm btn-primary" role="button">Details</a>
+                        {% if user == current_kegmaster.user %}
+                        <a href="{{ purchase.suggestion.get_absolute_url }}" class="btn btn-sm btn-default" role="button">All Out?</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
 
 <div class="row">
     <div class="col-md-12">
-        <h2>Keg Master <small>(Send donations to this guy/gal)</small></h2>
+        <h2>Keg Master <small>send donations to them</small></h2>
         {% if current_kegmaster %}
-            <h3><a href="/accounts/{{ current_kegmaster.user.id }}/profile/{{ current_kegmaster.user.username }}">
+            <h3 class="pull-left" style="margin:10px 0">
+                <a href="/accounts/{{ current_kegmaster.user.id }}/profile/{{ current_kegmaster.user.username }}">
                 {{ current_kegmaster.user.username }}
-            </a></h3>
+                </a>
+            </h3>
+            {% if user == current_kegmaster.user %}
+                <div class="pull-right" style="margin:10px 0">
+                    <a href="{% url 'accept_donation' %}" class="btn btn-primary">Accept new donations</a>
+                </div>
+
+            {% endif %}
+            <div class="clearfix"></div>
             <ul class="list-group">
             {% for option in current_kegmaster_payment_options %}
                 <li class="list-group-item">
@@ -33,9 +67,6 @@
                 </li>
             {% endfor %}
             </ul>
-            {% if user == current_kegmaster.user %}
-                <a href="{% url 'accept_donation' %}" class="btn btn-primary">Accept new donations</a>
-            {% endif %}
         {% else %}
             <p><strong>There is no current keg-master!</strong></p>
         {% endif %}
@@ -43,8 +74,28 @@
 </div>
 
 <div class="row">
+    <div class="col-md-12">
+        <h4>Funds</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Current</th>
+                    <th>Spent</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tr>
+                <td class="{% if balance > 0 %}success{% else %}danger{% endif %}">${{ balance }}</td>
+                <td>${{ spent }}</td>
+                <td>${{ total_donations }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-md-6 col-md-push-6">
-        <h2>Newly Added</h2>
+        <h2>Just Added <small>most recent</small></h2>
         <ul class="list-group">
         {% for suggestion in suggestions %}
             <a href="{{ suggestion.get_absolute_url }}" class="list-group-item">
@@ -57,10 +108,9 @@
             </a>
         {% endfor %}
         </ul>
-        <p><small>Showing 3 most recently added kegs.</small></p>
     </div>
     <div class="col-md-6 col-md-pull-6">
-        <h2>Keg List</h2>
+        <h2>Keg List <small>highest wins</small></h2>
         <ul class="list-group">
         {% for suggestion in winning_suggestions %}
             <a href="{{ suggestion.get_absolute_url }}"  class="list-group-item">
@@ -80,7 +130,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <h2>Purchase history</h2>
+        <h2>Purchase History <small>good job, everyone</small></h2>
         {% if purchase_history.count == 0 %}
             <p>All dry.  Go vote, and buy some kegs!</p>
         {% else %}
@@ -88,9 +138,14 @@
             {% for purchase in purchase_history %}
                 <a href="{{ purchase.suggestion.get_absolute_url }}" class="list-group-item">
                     <span class="badge">{{ purchase.suggestion.votes }} votes</span>
-                    <h4>{{ purchase.suggestion.untappd_keg.keg }}</h4>
+                    <h4>{{ purchase.suggestion.untappd_keg.keg }} <small>{{ purchase.get_state_display }}</small></h4>
                     <p><strong>{{ purchase.user.username }}</strong>
-                        purchased for <span class="label label-success">${{ purchase.suggestion.price }}</span></p>
+                    {% if purchase.state != purchase.state.KEG_CANNOT_ORDER %}
+                        purchased
+                    {% else %}
+                        <u>could not purchase</u>
+                    {% endif %}
+                    for <span class="label label-success">${{ purchase.suggestion.price }}</span></p>
                 </a>
             {% endfor %}
             </ul>

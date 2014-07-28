@@ -12,7 +12,8 @@ from django.views.generic import CreateView, DetailView
 from datetime import datetime
 from re import match
 
-from .forms import DonationForm, VoteForm, PurchaseForm, KegForm, PurchasePriceForm, AddPaymentOptionForm
+from .forms import DonationForm, VoteForm, PurchaseForm, KegForm, \
+    PurchasePriceForm, AddPaymentOptionForm, PurchaseChangeForm
 from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion
 from .shared import sum_queryset_field, get_user_balance
 
@@ -66,7 +67,8 @@ def home(request):
         'winning_suggestions': winning_suggestions,
         'current_kegmaster': keg_master,
         'current_kegmaster_payment_options': payment_options,
-        'purchase_history': get_keg_purchase_history()
+        'purchase_history': get_keg_purchase_history(),
+        'on_tap': get_kegs_on_tap(),
     }
     context.update(fund_context())
     response = render(request, 'index.html', context)
@@ -96,6 +98,12 @@ class KegDetail(DetailView):
             context['winning'] = (self.object in winning_suggestions)
             context['purchaseprice_form'] = PurchasePriceForm(instance=self.object)
             context['purchase_form'] = PurchaseForm(initial={'suggestion': self.object})
+            try:
+                # Would really like if the Form auto-grabbed the id, but i couldn't figure out how
+                context['purchase_change'] = PurchaseChangeForm(instance=self.object.purchase,
+                                                                initial={'purchase_id': self.object.purchase.id})
+            except Purchase.DoesNotExist:
+                pass
         return context
 
 
@@ -240,6 +248,26 @@ def purchase(request):
         return HttpResponseBadRequest()
 
 
+@require_POST
+@login_required
+def purchase_change(request):
+    form = PurchaseChangeForm(request.POST)
+    if form.is_valid():
+        # Check that the user is the current kegmaster
+        if request.user != get_current_kegmaster().user:
+            return HttpResponseBadRequest('You are not kegmaster')
+
+        purchase_form = form.save(commit=False)
+
+        purchase = Purchase.objects.get(id=form.cleaned_data['purchase_id'])
+        purchase.state = purchase_form.state
+        purchase.save()
+        messages.info(request, "Purchase of {} successfully updated".format(purchase.suggestion.untappd_keg.keg()))
+        return HttpResponseRedirect(purchase.suggestion.get_absolute_url())
+    else:
+        return HttpResponseBadRequest()
+
+
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -274,3 +302,6 @@ def get_donation_history(user):
 
 def get_keg_purchase_history():
     return Purchase.objects.order_by('-timestamp')
+
+def get_kegs_on_tap():
+    return Purchase.objects.filter(state=Purchase.KEG_ON_TAP).order_by('-timestamp')

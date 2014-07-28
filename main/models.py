@@ -119,6 +119,21 @@ class Purchase(models.Model):
     suggestion = models.OneToOneField(Suggestion)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    KEG_CANNOT_ORDER = -1
+    KEG_ORDERED = 1
+    KEG_ON_TAP = 2
+    KEG_EMPTY = 3
+    KEG_STATES = (
+        (KEG_CANNOT_ORDER, u'Cannot order'),
+        (KEG_ORDERED, u'Ordered'),
+        (KEG_ON_TAP, u'On Tap'),
+        (KEG_EMPTY, u'Empty'),
+    )
+    state = models.IntegerField(choices=KEG_STATES, default=KEG_ORDERED)
+
+    def __unicode__(self):
+        return '[{0.suggestion}] purchased by {0.user} - {1} @ {0.timestamp}'.format(self, self.get_state_display())
+
 
 class Vote(models.Model):
     user = models.ForeignKey(User)

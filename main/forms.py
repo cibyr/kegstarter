@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import ModelForm, ModelChoiceField
+from django.forms import ModelForm, ModelChoiceField, HiddenInput, IntegerField
 from .models import Donation, Vote, Purchase, Brewery, Keg, PaymentOption, Suggestion
 
 class DonationForm(ModelForm):
@@ -19,6 +19,13 @@ class PurchaseForm(ModelForm):
     class Meta:
         model = Purchase
         fields = ['suggestion']
+
+class PurchaseChangeForm(ModelForm):
+    purchase_id = IntegerField(widget=HiddenInput())
+
+    class Meta:
+        model = Purchase
+        fields = ['purchase_id', 'state']
 
 class PurchasePriceForm(ModelForm):
     class Meta:
