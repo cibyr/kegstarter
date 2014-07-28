@@ -228,11 +228,11 @@ def cache_brewery(untappd_brewery, untappd_api=init_api()):
     brewery.name = brew_info['brewery']['brewery_name']
     location = brew_info['brewery']['location']
     if not location['brewery_state']:
-        brewery.location = "{} ({})".format(
+        brewery.location = u"{} ({})".format(
             location['brewery_address'],
             location['brewery_city'])
     else:
-        brewery.location = "{} ({}, {})".format(
+        brewery.location = u"{} ({}, {})".format(
             location['brewery_address'],
             location['brewery_city'],
             location['brewery_state'])

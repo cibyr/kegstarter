@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.utils.http import urlquote
+from django.utils.encoding import iri_to_uri
 
 from .fields import CurrencyField
 from datetime import datetime, timedelta
@@ -44,7 +46,8 @@ class UntappdBrewery(UntappdModel):
             return self._brewery
 
     def get_absolute_url(self):
-        return u'/brewery/{}/{}'.format(self.pk, slugify(unicode(self.brewery().name)))
+        return iri_to_uri(u'/brewery/{}/{}'.format(self.pk,
+            urlquote(slugify(unicode(self.brewery().name)))))
 
 
 class Keg(models.Model):
@@ -85,9 +88,9 @@ class Suggestion(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
-        return u'/keg/{}/{}/{}'.format(self.pk,
-                                       slugify(unicode(self.untappd_keg.untappd_brewery.brewery().name)),
-                                       slugify(unicode(self.untappd_keg.keg().name)))
+        return iri_to_uri(u'/keg/{}/{}/{}'.format(self.pk,
+                                       urlquote(slugify(unicode(self.untappd_keg.untappd_brewery.brewery().name))),
+                                       urlquote(slugify(unicode(self.untappd_keg.keg().name)))))
 
     def votes(self):
         return self.vote_set.aggregate(Sum('value'))['value__sum'] or 0
