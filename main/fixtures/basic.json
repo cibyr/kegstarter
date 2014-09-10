@@ -13,12 +13,25 @@
     "model": "main.keg",
     "fields": {
         "style": "Lager",
-        "added": "2013-12-09T06:06:00.045Z",
         "name": "Generic Lager",
-        "gallons": 15.5,
-        "price": "123.00",
-        "brewery": 1,
         "desc": "A beer"
+    }
+},
+{
+    "pk": 2470,
+    "model": "main.untappdbrewery",
+    "fields": {
+      "expires": "2014-03-10T03:46:19.648Z",
+      "_brewery": 1
+    }
+},
+{
+    "pk": 562219,
+    "model": "main.untappdkeg",
+    "fields": {
+      "untappd_brewery": 2470,
+      "expires": "2014-03-10T03:46:20.720Z",
+      "_keg": 1
     }
 },
 {
@@ -73,6 +86,17 @@
         "password": "pbkdf2_sha256$12000$gCSRwd9BFVsi$XwJtiJoUehqO8+TYDhGTN02GvjOR+DPdWxLQiT2o5FE=",
         "email": "",
         "date_joined": "2013-12-09T05:35:51.921Z"
+    }
+},
+{
+    "pk": 1,
+    "model": "main.suggestion",
+    "fields": {
+      "untappd_keg": 562219,
+      "price": "123.00",
+      "proposed_by": null,
+      "timestamp": "2014-03-10T03:45:27.869Z",
+      "gallons": 15.5
     }
 }
 ]

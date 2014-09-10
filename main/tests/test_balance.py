@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from django.contrib.auth.models import User
 
-from main.models import Keg, Donation, Vote, Purchase
+from main.models import Keg, Donation, Vote, Purchase, Suggestion
 from main.views import get_user_balance, fund_context
 
 class BalanceTestCase(TestCase):
@@ -14,6 +14,7 @@ class BalanceTestCase(TestCase):
         self.kegop = User.objects.get(username='kegop')
         self.drinker = User.objects.get(username='drinker')
         self.keg = Keg.objects.get()
+        self.suggestion = Suggestion.objects.get()
 
     def testInitiallyNoBalance(self):
         self.assertEqual(get_user_balance(self.kegop), 0)
@@ -68,7 +69,7 @@ class BalanceTestCase(TestCase):
         self.assertEqual(context['total_donations'], 200)
         self.assertEqual(context['spent'], 0)
         self.assertEqual(context['balance'], 200)
-        Purchase(user=self.kegop, keg=self.keg).save()
+        Purchase(user=self.kegop, suggestion=self.suggestion).save()
         context = fund_context()
         self.assertEqual(context['total_donations'], 200)
         self.assertEqual(context['spent'], 123)
@@ -76,11 +77,11 @@ class BalanceTestCase(TestCase):
 
     def testSpendingVotes(self):
         Donation(user=self.drinker, amount=1, recipient=self.kegop).save()
-        Vote(user=self.drinker, keg=self.keg, value=1).save()
+        Vote(user=self.drinker, suggestion=self.suggestion, value=1).save()
         self.assertEqual(get_user_balance(self.drinker), 0)
         Donation(user=self.drinker, amount=100, recipient=self.kegop).save()
         self.assertEqual(get_user_balance(self.drinker), 100)
-        Vote(user=self.drinker, keg=self.keg, value=1).save()
+        Vote(user=self.drinker, suggestion=self.suggestion, value=1).save()
         self.assertEqual(get_user_balance(self.drinker), 99)
-        Vote(user=self.drinker, keg=self.keg, value=99).save()
+        Vote(user=self.drinker, suggestion=self.suggestion, value=99).save()
         self.assertEqual(get_user_balance(self.drinker), 0)
