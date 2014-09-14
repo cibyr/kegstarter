@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load markdown_filter %}
+
+{% block title %}{{ suggestion.untappd_keg.keg }} | Kegstarter{% endblock %}
+
+{% block content %}
+
+<h2>Are you sure?</h2>
+<h3>Cannot purchase {{ suggestion.untappd_keg.keg }}</h3>
+
+<p>This will also refund all votes for this suggestion, <strong>and cannot be reversed!</strong></p>
+
+<form role="form" method="post" action="{% url 'cannotpurchase' suggestion.pk %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <input class="btn btn-danger" type="submit" value="I confirm that this cannot be purchased">
+    </div>
+</form>
+
+{% endblock %}

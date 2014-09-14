@@ -1,32 +1,23 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
+        # Adding field 'Purchase.not_buyable'
+        db.add_column(u'main_purchase', 'not_buyable',
+                      self.gf('django.db.models.fields.BooleanField')(default=False),
+                      keep_default=False)
 
-        # South cannot extract the constants, so we'll put them here!
-        KEG_ORDERED = 1
-        KEG_ON_TAP = 2
-        KEG_EMPTY = 3
-
-        # We actually want to make all (but the last few) purchases now be in
-        # a state of empty, not ordered
-        for purchase in orm.Purchase.objects.all():
-            purchase.state = KEG_EMPTY
-            purchase.save()
-
-        # Make the last 3 in a state of purchased, not empty
-        for purchase in orm.Purchase.objects.all().order_by('-timestamp')[:3]:
-            purchase.state = KEG_ORDERED
-            purchase.save()
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        # Deleting field 'Purchase.not_buyable'
+        db.delete_column(u'main_purchase', 'not_buyable')
+
 
     models = {
         u'auth.group': {
@@ -109,6 +100,7 @@ class Migration(DataMigration):
         u'main.purchase': {
             'Meta': {'object_name': 'Purchase'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'not_buyable': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'state': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'suggestion': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['main.Suggestion']", 'unique': 'True'}),
             'timestamp': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -153,4 +145,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['main']
-    symmetrical = True

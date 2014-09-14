@@ -14,7 +14,7 @@ from re import match
 
 from .forms import DonationForm, VoteForm, PurchaseForm, KegForm, \
     PurchasePriceForm, AddPaymentOptionForm, PurchaseChangeForm
-from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion
+from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion, Vote
 from .shared import sum_queryset_field, get_user_balance
 
 from main.api.untappd import *
@@ -248,6 +248,65 @@ def purchase(request):
         return HttpResponseBadRequest()
 
 
+@login_required
+def cannotpurchase(request, suggestion_id):
+    if request.method == 'POST':
+        try:
+            suggestion = Suggestion.objects.get(pk=suggestion_id)
+        except Suggestion.DoesNotExist:
+            return HttpResponseBadRequest("Unknown keg")
+
+        # Check to make sure keg has not already been purchased
+        try:
+            if suggestion.purchase:
+                return HttpResponseBadRequest("Keg has already been purchased")
+        except Purchase.DoesNotExist:
+            pass
+
+        # Check that the user is the current kegmaster
+        if request.user != get_current_kegmaster().user:
+            return HttpResponseBadRequest("You are not keg master")
+
+        cannotpurchase = Purchase()
+        cannotpurchase.suggestion = suggestion
+        refund_votes(cannotpurchase.suggestion)
+        cannotpurchase.suggestion.price = 0
+        cannotpurchase.not_buyable = True
+        cannotpurchase.user = request.user
+        cannotpurchase.save()
+        cannotpurchase.suggestion.save()
+
+        messages.info(request, "Suggestion of {} successfully recorded as non-purchasable".format(cannotpurchase.suggestion.untappd_keg.keg()))
+        return HttpResponseRedirect(cannotpurchase.suggestion.get_absolute_url())
+    else:
+        try:
+            suggestion = Suggestion.objects.get(pk=suggestion_id)
+        except Suggestion.DoesNotExist:
+            messages.error(request, "Unknown keg")
+            return HttpResponseRedirect("/")
+
+        # Check to make sure keg has not already been purchased
+        try:
+            if suggestion.purchase:
+                messages.error(request, "Keg has already been purchased")
+                return HttpResponseRedirect(suggestion.get_absolute_url())
+        except Purchase.DoesNotExist:
+                pass
+
+        # Check that the user is the current kegmaster
+        if request.user != get_current_kegmaster().user:
+            messages.error(request, "You are not keg master")
+            return HttpResponseRedirect(suggestion.get_absolute_url())
+
+        context = {
+            'suggestion': suggestion,
+        }
+        return render(request, 'main/confirm_purchase_not_buyable.html', context)
+
+
+def refund_votes(suggestion):
+    Vote.objects.filter(suggestion=suggestion).delete()
+
 @require_POST
 @login_required
 def purchase_change(request):
@@ -258,15 +317,18 @@ def purchase_change(request):
             return HttpResponseBadRequest('You are not kegmaster')
 
         purchase_form = form.save(commit=False)
-
         purchase = Purchase.objects.get(id=form.cleaned_data['purchase_id'])
+
+        if purchase.not_buyable:
+            return HttpResponseBadRequest("Cannot change state on a non-buyable purchase")
+
+        # TODO: See if we can set the state outside the bounds of the current states
         purchase.state = purchase_form.state
         purchase.save()
         messages.info(request, "Purchase of {} successfully updated".format(purchase.suggestion.untappd_keg.keg()))
         return HttpResponseRedirect(purchase.suggestion.get_absolute_url())
     else:
         return HttpResponseBadRequest()
-
 
 def register(request):
     if request.method == 'POST':

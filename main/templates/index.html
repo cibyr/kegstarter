@@ -11,7 +11,10 @@
     {% if on_tap.count == 0 %}
         <div class="col-md-12">
         {% if current_kegmaster %}
-            <p>Tell you're Keg Master to buy a keg!</p>
+            <p>Tell your Keg Master,
+                <a href="/accounts/{{ current_kegmaster.user.id }}/profile/{{ current_kegmaster.user.username }}">
+                {{ current_kegmaster.user.username }}</a>, to buy a keg!
+            </p>
         {% else %}
             <p>Appoint someone a Keg Master!  Then, buy some kegs!</p>
         {% endif %}
@@ -111,6 +114,7 @@
     </div>
     <div class="col-md-6 col-md-pull-6">
         <h2>Keg List <small>highest wins</small></h2>
+
         <ul class="list-group">
         {% for suggestion in winning_suggestions %}
             <a href="{{ suggestion.get_absolute_url }}"  class="list-group-item">
@@ -137,15 +141,21 @@
             <ul class="list-group">
             {% for purchase in purchase_history %}
                 <a href="{{ purchase.suggestion.get_absolute_url }}" class="list-group-item">
-                    <span class="badge">{{ purchase.suggestion.votes }} votes</span>
-                    <h4>{{ purchase.suggestion.untappd_keg.keg }} <small>{{ purchase.get_state_display }}</small></h4>
-                    <p><strong>{{ purchase.user.username }}</strong>
-                    {% if purchase.state != purchase.state.KEG_CANNOT_ORDER %}
-                        purchased
-                    {% else %}
-                        <u>could not purchase</u>
+                    {% if purchase.buyable %}
+                        <span class="badge">{{ purchase.suggestion.votes }} votes</span>
                     {% endif %}
-                    for <span class="label label-success">${{ purchase.suggestion.price }}</span></p>
+                    <h4>{{ purchase.suggestion.untappd_keg.keg }}
+                        {% if purchase.buyable %}
+                            <small>{{ purchase.get_state_display }}</small>
+                        {% endif %}
+                    </h4>
+                    <p><strong>{{ purchase.user.username }}</strong>
+                    {% if purchase.not_buyable %}
+                        could not purchase
+                    {% else %}
+                        purchased for <span class="label label-success">${{ purchase.suggestion.price }}</span>
+                    {% endif %}
+                    </p>
                 </a>
             {% endfor %}
             </ul>
