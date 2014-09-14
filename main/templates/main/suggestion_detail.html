@@ -18,7 +18,22 @@
 </table>
 
 {% if suggestion.purchase %}
-    <p>This keg has been purchased by {{ suggestion.purchase.user }} on {{ suggestion.purchase.timestamp }}</p>
+    {% if suggestion.purchase.not_buyable %}
+        <p>This keg cannot be purchased - {{ suggestion.purchase.user }} on {{ suggestion.purchase.timestamp }}</p>
+    {% else %}
+        <p>This keg has been purchased by {{ suggestion.purchase.user }} on {{ suggestion.purchase.timestamp }}</p>
+        {% if user_is_current_kegmaster %}
+        <form role="form" method="post" action="{% url 'purchase_change' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ purchase_change }}
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary" type="submit" value="Update">
+            </div>
+        </form>
+        {% endif %}
+    {% endif %}
 {% elif suggestion.price > balance %}
     <p>We can't afford this keg right now.</p>
 {% elif winning %}
@@ -31,15 +46,18 @@
                 {{ purchaseprice_form }}
             </div>
             <div class="form-group">
-                <input class="btn btn-primary" type="submit" value="Click here to confirm that you are buying this keg">
+                <input class="btn btn-primary" type="submit" value="Buy Keg">
             </div>
         </form>
+        <a class="btn btn-danger" href="{% url 'cannotpurchase' suggestion.pk %}">Cannot Purchase</a>
     {% endif %}
 {% else %}
     {# TODO: Show this keg's current position in the voting #}
 {% endif %}
 
+{% if suggestion.purchase.buyable %}
 <p>This keg currently has {{ suggestion.votes }} votes.</p>
+{% endif %}
 
 <h2>Description</h2>
 <p>{{ suggestion.untappd_keg.keg.desc|format_markdown}}</p>

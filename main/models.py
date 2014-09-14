@@ -118,6 +118,25 @@ class Purchase(models.Model):
     user = models.ForeignKey(User)
     suggestion = models.OneToOneField(Suggestion)
     timestamp = models.DateTimeField(auto_now_add=True)
+    not_buyable = models.BooleanField(default=False)
+
+    KEG_ORDERED = 1
+    KEG_ON_TAP = 2
+    KEG_EMPTY = 3
+    KEG_STATES = (
+        (KEG_ORDERED, u'Ordered'),
+        (KEG_ON_TAP, u'On Tap'),
+        (KEG_EMPTY, u'Empty'),
+    )
+    state = models.IntegerField(choices=KEG_STATES, default=KEG_ORDERED)
+
+    def buyable(self):
+        return not self.not_buyable
+
+    def __unicode__(self):
+        return '[{0.suggestion}] {2} by {0.user} - {1} @ {0.timestamp}'\
+            .format(self, self.get_state_display(),
+                    "could not purchase" if self.not_buyable else "purchased")
 
 
 class Vote(models.Model):
