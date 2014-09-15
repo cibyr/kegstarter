@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
@@ -348,6 +349,10 @@ def register(request):
         form = UserCreationWithEmailForm(request.POST)
         if form.is_valid():
             new_user = form.save()
+            new_user = authenticate(username=new_user.username,
+                                    password=request.POST['password1'])
+            login(request, new_user)
+            messages.info(request, "Thanks for registering! You are now logged in.")
             return HttpResponseRedirect("/")
     else:
         form = UserCreationWithEmailForm()
