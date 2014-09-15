@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.db.models import Sum, Max, Q
@@ -13,7 +12,8 @@ from datetime import datetime
 from re import match
 
 from .forms import DonationForm, VoteForm, PurchaseForm, KegForm, \
-    PurchasePriceForm, AddPaymentOptionForm, PurchaseChangeForm
+    PurchasePriceForm, AddPaymentOptionForm, PurchaseChangeForm, \
+    UserCreationWithEmailForm
 from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion, Vote
 from .shared import sum_queryset_field, get_user_balance
 
@@ -332,12 +332,12 @@ def purchase_change(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = UserCreationWithEmailForm(request.POST)
         if form.is_valid():
             new_user = form.save()
             return HttpResponseRedirect("/")
     else:
-        form = UserCreationForm()
+        form = UserCreationWithEmailForm()
     context = { 'form': form }
     return render(request, "registration/register.html", context)
 
