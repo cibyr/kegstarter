@@ -19,6 +19,13 @@ class UserCreationWithEmailForm(UserCreationForm):
             user.save()
         return user
 
+class UserInfoForm(ModelForm):
+    email = EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('email',)
+
 
 class DonationForm(ModelForm):
     user = ModelChoiceField(queryset=User.objects.order_by('username'))

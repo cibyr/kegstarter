@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
 from django.db.models import Sum, Max, Q
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
@@ -13,7 +14,7 @@ from re import match
 
 from .forms import DonationForm, VoteForm, PurchaseForm, KegForm, \
     PurchasePriceForm, AddPaymentOptionForm, PurchaseChangeForm, \
-    UserCreationWithEmailForm
+    UserCreationWithEmailForm, UserInfoForm
 from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion, Vote
 from .shared import sum_queryset_field, get_user_balance
 
@@ -173,21 +174,33 @@ def profile(request, user_id):
         'requested_user': requested_user
     }
 
-    # Only display form is it's same user
+    # Only display form if it's same user
     if requested_user == request.user:
+        user_form = UserInfoForm(instance=request.user)
+        form = AddPaymentOptionForm()
+
         context['same_user'] = True
         if request.method == 'POST':
-            form = AddPaymentOptionForm(request.POST)
+            if 'add_payment' in request.POST:
+                form = AddPaymentOptionForm(request.POST)
 
-            if form.is_valid():
-                payment_option = form.save(commit=False)
-                payment_option.user = request.user
-                payment_option.save()
-            return HttpResponseRedirect(reverse('profile', args={user_id}))
-        else:
-            form = AddPaymentOptionForm()
+                if form.is_valid():
+                    payment_option = form.save(commit=False)
+                    payment_option.user = request.user
+                    payment_option.save()
+                    messages.info(request, "Payment option added.")
+                    return HttpResponseRedirect(reverse('profile', args={user_id}))
+
+            if 'change_info' in request.POST:
+                user_form = UserInfoForm(request.POST, instance=request.user)
+                if user_form.is_valid():
+                    user_form.save()
+                    messages.info(request, "Profile info successfully updated!")
+                    return HttpResponseRedirect(reverse('profile', args={user_id}))
 
         context['payment_options_form'] = form
+        context['user_form'] = user_form
+        context['change_password_form'] = PasswordChangeForm(request.user)
 
     return render(request, 'main/profile.html', context)
 

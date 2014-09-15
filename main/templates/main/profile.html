@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 {% load markdown_filter %}
 
 {% block title %}{{ requested_user }} | Kegstarter{% endblock %}
@@ -9,7 +10,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <h2>Payment Options</h2>
+        <h3>Payment Options</h3>
         {% if payment_options|length > 0 %}
         <ul class="list-group">
         {% for option in payment_options %}
@@ -31,13 +32,35 @@
         <p>Looks like {% if same_user %}you{% else %}they{% endif %} haven't set up any payments yet!</p>
         {% endif %}
         {% if same_user %}
-        <form action="" method="post" role="form" class="form-horizontal">
-            {% csrf_token %}
-            {{ payment_options_form.as_p }}
-            <input type="submit" value="Add Payment Option" />
-        </form>
+        <div class="well">
+            <form action="" method="post" role="form" class="form-horizontal">
+                {% csrf_token %}
+                {{ payment_options_form | crispy }}
+                <p>* Required field</p>
+                <input type="submit" name="add_payment" class="btn btn-primary" value="Add Payment Option" />
+            </form>
+        </div>
         {% endif %}
     </div>
 </div>
+
+{% if same_user %}
+<div class="row">
+    <div class="col-md-12">
+        <h3>Profile</h3>
+        <h4>Info</h4>
+        <div class="well">
+            <form action="" method="post" role="form" class="form-horizontal">
+                {% csrf_token %}
+                {{ user_form | crispy }}
+                <p>* Required field</p>
+                <input type="submit" name="change_info" class="btn btn-primary" value="Add Payment Option" />
+            </form>
+        </div>
+        <h4>Change Password</h4>
+        <a href="{% url 'password_change' %}" class="btn">Change your password</a>
+    </div>
+</div>
+{% endif %}
 
 {% endblock %}
