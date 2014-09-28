@@ -55,12 +55,16 @@
 </nav>
 <div class="container">
     {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-info alert-dismissable {% if message.tags %}{{ message.tags }}{% endif %}">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        <strong>Hey!</strong> {{ message }}
-    </div>
-    {% endfor %}
+        {% for message in messages %}
+            {% if message.level >= 40 %}
+            <div class="alert alert-danger alert-dismissable">
+            {% else %}
+            <div class="alert alert-info alert-dismissable">
+            {% endif %}
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <strong>Hey!</strong> {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
     {% block content %}{% endblock %}
 </div>
