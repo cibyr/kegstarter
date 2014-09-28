@@ -15,8 +15,8 @@ from re import match
 
 from .forms import DonationForm, VoteForm, PurchaseForm, KegForm, \
     PurchasePriceForm, AddPaymentOptionForm, PurchaseChangeForm, \
-    UserCreationWithEmailForm, UserInfoForm
-from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion, Vote
+    UserCreationWithEmailForm, UserInfoForm, CommentForm, CommentDeleteForm
+from .models import Brewery, Donation, Purchase, KegMaster, PaymentOption, Suggestion, Vote, Comment
 from .shared import sum_queryset_field, get_user_balance
 
 from main.api.untappd import *
@@ -89,6 +89,8 @@ class KegDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super(KegDetail, self).get_context_data(**kwargs)
         context.update(fund_context())
+        # Get all top level comments for this Keg
+        context['comments'] = Comment.objects.filter(suggestion=self.object, parent=None)
         winning_suggestions = get_winning_suggestions(context['balance'])
         if self.request.user.is_authenticated():
             current_kegmaster = get_current_kegmaster()
@@ -233,6 +235,45 @@ def vote(request):
         return HttpResponseRedirect(vote.suggestion.get_absolute_url())
     else:
         return HttpResponseBadRequest()
+
+
+@require_POST
+@login_required
+def comment(request):
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        comment_obj = form.save(commit=False)
+        comment_obj.user = request.user
+        comment_obj.save()
+        messages.info(request, "Comment posted")
+        return HttpResponseRedirect(comment_obj.suggestion.get_absolute_url())
+    elif "value" not in form.cleaned_data:
+        messages.error(request, "Comment failed: Message must not be empty")
+        if "suggestion" in form.cleaned_data:
+            return HttpResponseRedirect(form.cleaned_data['suggestion'].get_absolute_url())
+        else:
+            return HttpResponseRedirect("/")
+    return HttpResponseBadRequest()
+
+
+@require_POST
+@login_required
+def comment_delete(request):
+    form = CommentDeleteForm(request.POST)
+    if form.is_valid():
+        try:
+            comment_obj = Comment.objects.get(pk=form.cleaned_data['comment_id'])
+        except Comment.DoesNotExist:
+            return HttpResponseBadRequest("Unknown comment")
+
+        if comment_obj.user == request.user:
+            comment_obj.hide_comment()
+            messages.info(request, "Comment deleted")
+            return HttpResponseRedirect(comment_obj.suggestion.get_absolute_url())
+        else:
+            messages.error(request, "You cannot delete someone else's comment")
+            return HttpResponseRedirect(comment_obj.suggestion.get_absolute_url())
+    return HttpResponseBadRequest()
 
 
 @require_POST

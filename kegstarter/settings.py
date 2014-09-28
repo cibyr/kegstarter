@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'crispy_forms',
     'south', # Schema migrations
+    'mptt', # Commenting
 )
 
 MIDDLEWARE_CLASSES = (

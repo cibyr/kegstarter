@@ -8,6 +8,7 @@ from django.utils.encoding import iri_to_uri
 from .fields import CurrencyField
 from datetime import datetime, timedelta
 from django.utils.timezone import utc
+from mptt.models import MPTTModel, TreeForeignKey
 
 class UntappdModel(models.Model):
     untappd_id = models.IntegerField(primary_key=True)
@@ -179,3 +180,20 @@ class UntappdCredentials(models.Model):
 
     def __unicode__(self):
         return 'UntappdCredentials for {}'.format(self.user)
+
+
+class Comment(MPTTModel):
+    user = models.ForeignKey(User)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    value = models.TextField()
+    suggestion = models.ForeignKey(Suggestion)
+    deleted = models.BooleanField(default=False)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+
+    def hide_comment(self):
+        self.deleted = True
+        # TODO: Clear/mangle value field?
+        self.save()
+
+    class MPTTMeta:
+        order_insertion_by = ['timestamp']

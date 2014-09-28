@@ -14,6 +14,8 @@ urlpatterns = patterns('',
     url(r'^keg/create/', 'main.views.create_keg', name='keg_create'),
     url(r'^brewery/(?P<pk>\d+)/', BreweryDetail.as_view(), name='brewery'),
     url(r'^vote', 'main.views.vote', name='vote'),
+    url(r'^comment/post', 'main.views.comment', name='comment'),
+    url(r'^comment/delete', 'main.views.comment_delete', name='comment_delete'),
 
     url(r'^donations/accept/$', 'main.views.accept_donation', name='accept_donation'),
 

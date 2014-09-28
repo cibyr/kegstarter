@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import ModelForm, ModelChoiceField, HiddenInput, IntegerField, EmailField
-from .models import Donation, Vote, Purchase, Brewery, Keg, PaymentOption, Suggestion
+from .models import Donation, Vote, Purchase, Brewery, Keg, PaymentOption, Suggestion, Comment
 
 
 class UserCreationWithEmailForm(UserCreationForm):
@@ -38,6 +38,21 @@ class VoteForm(ModelForm):
     class Meta:
         model = Vote
         fields = ['suggestion', 'value']
+
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['suggestion', 'value']
+
+
+class CommentDeleteForm(ModelForm):
+    comment_id = IntegerField(widget=HiddenInput())
+
+    class Meta:
+        model = Comment
+        fields = ['suggestion']
+
 
 class PurchaseForm(ModelForm):
     class Meta:

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load markdown_filter %}
+{% load mptt_tags %}
 
 {% block title %}{{ suggestion.untappd_keg.keg }} | Kegstarter{% endblock %}
 
@@ -92,5 +93,48 @@
     {% endif %}
     <p>(You currently have {{user_balance}} votes)</p>
 {% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Comments</h2>
+        {% if comments %}
+            {% recursetree comments %}
+                <blockquote class="comment" id="comment{{ node.pk }}">
+                    <header><a href="/accounts/{{ node.user.id }}/profile/{{ node.user.username }}">{{ node.user.username }}</a> commented on {{ node.timestamp }}</header>
+                    <p>
+                        {% if not node.deleted %}
+                            {{ node.value }}
+                        {% else %}
+                            <small>Comment has been deleted.</small>
+                        {% endif %}
+                    </p>
+                    {% if user.is_authenticated and node.user == user %}
+                        <form class="form" method="post" action="{% url 'comment_delete' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
+                            <input type="hidden" name="comment_id" value="{{ node.pk }}">
+                            <input class="btn btn-danger btn-xs" type="submit" value="Delete this comment">
+                        </form>
+                    {% endif %}
+                </blockquote>
+            {% endrecursetree %}
+        {% else %}
+            <p>No comments, yet.</p>
+        {% endif %}
+        {% if user.is_authenticated %}
+            <h3>Post a Comment</h3>
+            <form class="form" method="post" action="{% url 'comment' %}">
+                {% csrf_token %}
+                <input type="hidden" name="suggestion" value="{{ suggestion.pk }}">
+                <div class="form-group">
+                    <textarea name="value" placeholder="Comment here..." class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <input class="btn btn-default" type="submit" value="Comment">
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}
