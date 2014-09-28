@@ -146,7 +146,7 @@ def create_keg(request):
         else:
             try:
                 context['recent_checkins'] = get_recent_checkins(untappd_api)
-            except InvalidAuth:
+            except (InvalidAuth, UntappdException):
                 # Re-setup our Untappd stuff
                 expire_user_token(request.user)
                 untappd_api = init_api(redirect_url=UNTAPPD_REDIRECT_URL)
