@@ -244,6 +244,8 @@ def purchase(request):
         purchase = form.save(commit=False)
         kegprice = form_kegprice.save(commit=False)
         purchase.suggestion.price = kegprice.price
+        if purchase.suggestion.price < 0:
+            return HttpResponseBadRequest('Cannot buy keg with a negative amount')
         # Check that the keg is the current winner
         current_balance = fund_context()['balance']
         if purchase.suggestion not in get_winning_suggestions(current_balance):
