@@ -97,7 +97,7 @@ class Suggestion(models.Model):
         return self.vote_set.aggregate(Sum('value'))['value__sum'] or 0
 
     def __unicode__(self):
-        return '{} ({} votes) - by {}'.format(self.untappd_keg.keg(), self.votes(), self.proposed_by)
+        return u'{} ({} votes) - by {}'.format(self.untappd_keg.keg(), self.votes(), self.proposed_by)
 
 
 class Donation(models.Model):
@@ -112,7 +112,7 @@ class Donation(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return '${0.amount} from {0.user} to {0.recipient}'.format(self)
+        return u'${0.amount} from {0.user} to {0.recipient}'.format(self)
 
 
 class Purchase(models.Model):
@@ -135,7 +135,7 @@ class Purchase(models.Model):
         return not self.not_buyable
 
     def __unicode__(self):
-        return '[{0.suggestion}] {2} by {0.user} - {1} @ {0.timestamp}'\
+        return u'[{0.suggestion}] {2} by {0.user} - {1} @ {0.timestamp}'\
             .format(self, self.get_state_display(),
                     "could not purchase" if self.not_buyable else "purchased")
 
@@ -147,7 +147,7 @@ class Vote(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return '{0.value} votes by {0.user} for {0.suggestion}'.format(self)
+        return u'{0.value} votes by {0.user} for {0.suggestion}'.format(self)
 
 
 class KegMaster(models.Model):
@@ -156,7 +156,7 @@ class KegMaster(models.Model):
     end = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
-        return '{0.user} is keg master from {0.start} to {0.end}'.format(self)
+        return u'{0.user} is keg master from {0.start} to {0.end}'.format(self)
 
 
 class PaymentOption(models.Model):
@@ -167,7 +167,7 @@ class PaymentOption(models.Model):
     preferred = models.BooleanField()
 
     def __unicode__(self):
-        return '{0.user}: {0.name} = {0.value} ({0.info})'.format(self)
+        return u'{0.user}: {0.name} = {0.value} ({0.info})'.format(self)
 
 
 class UntappdCredentials(models.Model):
@@ -179,7 +179,7 @@ class UntappdCredentials(models.Model):
         verbose_name_plural = "untappd credentials"
 
     def __unicode__(self):
-        return 'UntappdCredentials for {}'.format(self.user)
+        return u'UntappdCredentials for {}'.format(self.user)
 
 
 class Comment(MPTTModel):
