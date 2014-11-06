@@ -103,7 +103,7 @@
                     <header><a href="/accounts/{{ node.user.id }}/profile/{{ node.user.username }}">{{ node.user.username }}</a> commented on {{ node.timestamp }}</header>
                     <p>
                         {% if not node.deleted %}
-                            {{ node.value }}
+                            {{ node.value|format_markdown }}
                         {% else %}
                             <small>Comment has been deleted.</small>
                         {% endif %}
