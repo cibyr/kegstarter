@@ -11,8 +11,9 @@
 <table>
 <tr><th>Brewery</th><td><a href="{{ suggestion.untappd_keg.untappd_brewery.get_absolute_url }}">{{ suggestion.untappd_keg.untappd_brewery.brewery }}</a></td></tr>
 <tr><th>Style</th><td>{{ suggestion.untappd_keg.keg.style }}</td></tr>
-<tr><th>Volume</th><td>{{ suggestion.gallons }} (US gallons)</td></tr>
+{% if suggestion.purchase %}
 <tr><th>Price</th><td>${{ suggestion.price }}</td></tr>
+{% endif %}
 {% if suggestion.proposed_by %}
 <tr><th>Proposed by</th><td>{{ suggestion.proposed_by }}</td></tr>
 {% endif %}
