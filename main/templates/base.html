@@ -26,7 +26,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/"><img src="{% static 'logo-nav.png' %}" alt="KegStarter"/></a>
+            <div class="navbar-brand-container">
+                <a class="navbar-brand" href="/"><img src="{% static 'logo-nav.png' %}" alt="KegStartr"/></a>
+                {% for hint in get_hints %}
+                <a class="navbar-brand navbar-brand-hint" style="top: {{hint.offset_top}}px;left: {{hint.offset_left}}px;" title="{{hint.tooltip}}" href="/">
+                    <img src="{% static hint.resource %}" alt=""/>
+                </a>
+                {% endfor %}
+            </div>
         </div>
         <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">

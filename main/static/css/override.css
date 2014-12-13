@@ -1,5 +1,13 @@
 body { padding-top: 70px; }
 
+.navbar-brand-container {
+    position: relative;
+}
+
+.navbar-brand-hint {
+    position: absolute;
+}
+
 /* BEGIN keg form */
 .keg-form {
     padding: 0;

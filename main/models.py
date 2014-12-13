@@ -197,3 +197,18 @@ class Comment(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by = ['timestamp']
+
+
+class LogoHint(models.Model):
+    class Meta:
+        ordering = ['-date']
+
+    resource = models.CharField(max_length=256)
+    offset_left = models.IntegerField(default=0)
+    offset_top = models.IntegerField(default=0)
+    tooltip = models.CharField(max_length=256, default="", blank=True)
+    date = models.DateField()
+    use_year = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u'{0.resource} (Top: {0.offset_top}, Left: {0.offset_left}) on {0.date} (Use Year? {0.use_year})'.format(self)

@@ -54,6 +54,7 @@ MIDDLEWARE_CLASSES = (
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'main.context_processors.user_stats.get_user_votes',
+    'main.context_processors.logo_hint.get_hints',
 )
 
 ROOT_URLCONF = 'kegstarter.urls'
