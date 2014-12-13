@@ -48,11 +48,14 @@
                 <input class="btn btn-primary" type="submit" value="Buy Keg">
             </div>
         </form>
-        <a class="btn btn-danger" href="{% url 'cannotpurchase' suggestion.pk %}">Cannot Purchase</a>
     {% endif %}
 {% else %}
     <p>This keg is not high enough on the list to purchase.</p>
     {# TODO: Show this keg's current position in the voting #}
+{% endif %}
+
+{% if user_is_current_kegmaster %}
+    <a class="btn btn-danger" href="{% url 'cannotpurchase' suggestion.pk %}">Cannot Purchase</a>
 {% endif %}
 
 {% if suggestion.purchase.buyable %}
