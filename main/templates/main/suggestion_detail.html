@@ -64,7 +64,11 @@
 {% endif %}
 
 <h2>Description</h2>
-<p>{{ suggestion.untappd_keg.keg.desc|format_markdown}}</p>
+{% if suggestion.untappd_keg.keg.desc %}
+    <p>{{ suggestion.untappd_keg.keg.desc }}</p>
+{% else %}
+    <p>This keg does not have a description.</p>
+{% endif %}
 
 {% if user.is_authenticated and not suggestion.purchase %}
     {# TODO: AJAX the voting #}
