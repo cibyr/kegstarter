@@ -78,8 +78,11 @@ def home(request):
     return response
 
 def get_winning_suggestions(current_balance):
-    buyable_suggestions = Suggestion.objects.filter(price__lte=current_balance)
-    nonpurchased_suggestions = buyable_suggestions.filter(purchase=None)
+    # We currently want all kegs that haven't been purchased.  This is because
+    # you can technically buy kegs that bring you more and more into the red.
+    # This is not a good thing to do, but you could do it and the keg master
+    # will just be in the red - it's their job to get back in the black.
+    nonpurchased_suggestions = Suggestion.objects.filter(purchase=None)
     suggestions_by_votes = nonpurchased_suggestions.annotate(votes=Sum('vote__value'))
     return suggestions_by_votes
 

@@ -35,10 +35,8 @@
         </form>
         {% endif %}
     {% endif %}
-{% elif suggestion.price > balance %}
-    <p>We can't afford this keg right now.</p>
 {% elif winning %}
-    <p>This keg is the current candidate for the next purchase.</p>
+    <p>This keg is a candidate for the next purchase.</p>
     {% if user_is_current_kegmaster %}
         <form role="form" method="post" action="{% url 'purchase' %}">
             {% csrf_token %}
@@ -53,6 +51,7 @@
         <a class="btn btn-danger" href="{% url 'cannotpurchase' suggestion.pk %}">Cannot Purchase</a>
     {% endif %}
 {% else %}
+    <p>This keg is not high enough on the list to purchase.</p>
     {# TODO: Show this keg's current position in the voting #}
 {% endif %}
 
